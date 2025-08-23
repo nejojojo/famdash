@@ -1,0 +1,23 @@
+{
+  "name": "family-health-dashboard",
+  "version": "1.0.0",
+  "description": "Family health monitoring dashboard with Google Fit integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["health", "dashboard", "google-fit", "family", "monitoring"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  }
+}

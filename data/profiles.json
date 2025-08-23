@@ -1,0 +1,34 @@
+{
+  "members": [
+    {
+      "id": "member1",
+      "name": "You",
+      "email": "your.email@example.com",
+      "googleFitToken": null,
+      "latestHeartRate": 75,
+      "latestSteps": 8500,
+      "latestSleep": 7.5,
+      "lastUpdated": "2025-08-23T10:00:00Z"
+    },
+    {
+      "id": "member2", 
+      "name": "Family Member 1",
+      "email": "family1@example.com",
+      "googleFitToken": null,
+      "latestHeartRate": 68,
+      "latestSteps": 12000,
+      "latestSleep": 8.0,
+      "lastUpdated": "2025-08-23T10:00:00Z"
+    },
+    {
+      "id": "member3",
+      "name": "Family Member 2", 
+      "email": "family2@example.com",
+      "googleFitToken": null,
+      "latestHeartRate": 72,
+      "latestSteps": 6800,
+      "latestSleep": 6.5,
+      "lastUpdated": "2025-08-23T10:00:00Z"
+    }
+  ]
+}
