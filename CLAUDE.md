@@ -4,88 +4,101 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Lean AIbasekit - a structured framework for rapidly developing software projects using AI assistance. The repository contains custom Claude Code commands that create a systematic workflow from idea to implementation.
+**Family Health Dashboard** - A web-based family health monitoring system that connects to Google Fit API to display real-time health metrics for 3 family members and sends emergency email alerts when dangerous health thresholds (>160 BPM heart rate) are exceeded.
 
-## Custom Commands Workflow
+## Architecture & Tech Stack
 
-This project uses a three-stage development workflow:
+**Frontend**: HTML/JavaScript with shadcn/ui components and Tailwind CSS
+**Backend**: Node.js with Express for Google Fit API integration
+**Data Storage**: JSON files for family member profiles and health data
+**UI Framework**: Tailwind CSS with shadcn/ui design patterns
+**Alert System**: nodemailer for email notifications
 
-1. **`/start`** - Project idea gathering and clarification
-   - Conducts adaptive questioning to understand requirements
-   - Outputs: `docs/idea-summary.md`
+## Key Commands
 
-2. **`/prp-generator`** - Product Requirements Prompts generation
-   - Creates technical requirements from idea summary
-   - Reads: `docs/idea-summary.md`
-   - Outputs: `docs/prp.md`
+```bash
+# Development
+npm install                    # Install dependencies
+npm run start                  # Start Express server on port 3000
+npm run dev                    # Development mode (same as start)
 
-3. **`/implementation`** - Implementation plan creation
-   - Breaks PRP into micro-tasks with test cases
-   - Reads: `docs/prp.md`
-   - Outputs: `docs/implementation-plan.md`
+# Frontend Build
+npx tailwindcss -i ./src/input.css -o ./public/output.css    # Build CSS
+npx tailwindcss -i ./src/input.css -o ./public/output.css --watch    # Watch mode
 
-## Development Principles
-
-### Micro-Task Implementation
-- Tasks are limited to 10-15 lines of code maximum
-- Each batch contains 2-3 tasks to manage context window
-- Total project scope: 8-12 micro-tasks
-
-### Testing Philosophy
-- Manual testing after EVERY task completion
-- Specific test commands and expected outputs provided
-- Stop and fix if any test fails before proceeding
-
-### Document Updates
-- After each batch completion, update `docs/implementation-plan.md` with:
-  - Actual implementation details
-  - Test results
-  - Files created/modified
-  - Completion timestamp
+# Testing
+open http://localhost:3000     # View dashboard in browser
+curl http://localhost:3000/api/health-data    # Test API endpoint
+```
 
 ## Project Structure
 
 ```
-lean_AIbasekit/
-├── .claude/
-│   └── commands/
-│       ├── start.md           # Idea gathering command
-│       ├── prp-generator.md   # PRP creation command
-│       └── implementation.md  # Implementation plan command
-└── docs/                      # Generated documentation
-    ├── idea-summary.md       # Project idea summary
-    ├── prp.md               # Project Requirements Plan
-    └── implementation-plan.md # Micro-task implementation plan
+famdash/
+├── server.js                  # Express server & Google Fit API integration
+├── alerts.js                  # Health threshold monitoring & email alerts
+├── public/
+│   ├── index.html            # Main dashboard with shadcn/ui cards
+│   ├── output.css            # Compiled Tailwind CSS
+│   └── app.js                # Frontend JavaScript (dashboard logic)
+├── data/
+│   └── profiles.json         # Family member health data & configurations
+├── src/
+│   └── input.css             # Tailwind base styles
+├── docs/                     # Implementation documentation
+│   ├── prp.md               # Project Requirements Plan
+│   └── implementation-plan.md # Micro-task breakdown & progress
+└── tailwind.config.js        # Tailwind configuration
 ```
+
+## Core Data Flow
+
+1. **Google Fit API** → `fetchGoogleFitData()` pulls heart rate, steps, sleep data
+2. **JSON Storage** → Data saved to `data/profiles.json` via `updateMemberHealthData()`
+3. **Dashboard Display** → Frontend calls `/api/health-data` every 5 minutes
+4. **Threshold Monitoring** → `checkHealthThresholds()` detects >160 BPM heart rate
+5. **Alert System** → `sendEmergencyAlert()` sends email notifications via nodemailer
+
+## Implementation Approach
+
+This project follows a **micro-task skeleton-first approach**:
+- Tasks limited to 10-15 lines of code maximum
+- 4 conversation batches: Foundation, Backend Core, Frontend Integration, Monitoring & Alerts
+- Manual testing after EVERY task completion
+- JSON file storage for MVP (expandable to database later)
+- Focus on 3 family members maximum for initial implementation
 
 ## Key Implementation Guidelines
 
-### Code Quality Requirements
-- Verbose, readable code over compact solutions
-- Maximum 15 lines per function
-- Descriptive variable names
-- Comments explaining business logic
-- No nested ternary operators
-- Separate files for different concerns
+### Code Quality
+- Verbose, readable code over compact solutions (max 15 lines per function)
+- Descriptive variable names and business logic comments
+- One responsibility per function, separate files for different concerns
+- No nested ternary operators or excessive method chaining
 
-### Conversation Management
-- Start fresh conversation for each batch
-- Always provide PRP context when starting
-- Reference completed work from previous batches
-- Use provided conversation templates in implementation plan
+### Development Workflow
+- Always read `docs/implementation-plan.md` first to check task status
+- Update implementation plan with completion timestamps and file details
+- Test after each task before proceeding to next
+- Use conversation templates for fresh sessions if context window becomes issue
 
-## Working with This Repository
+### Current Status
+- **Batch 1**: ✅ Complete (Project setup + shadcn/ui dashboard)
+- **Batch 2**: Pending (Express server + Google Fit API + health data fetching)
+- **Batch 3**: Pending (Frontend JavaScript + API endpoints + real-time updates)
+- **Batch 4**: Pending (Health threshold monitoring + email alert system)
 
-When implementing a project:
-1. Always read the current `docs/implementation-plan.md` first
-2. Check task status indicators (⬜ Not Started, 🟦 In Progress, ✅ Complete)
-3. Implement tasks in order within each batch
-4. Run manual tests after each task
-5. Update documentation after batch completion
+## Google Fit Integration
 
-## Important Notes
+The system requires OAuth2 setup for Google Fit API access:
+- Scopes needed: fitness data read permissions
+- Family members authenticate individually via `authenticateGoogleFit()`
+- Data pulled every 5 minutes: heart rate, steps, sleep metrics
+- API failures handled gracefully with "Data unavailable" messages
 
-- This is a skeleton-first approach - focus on MVP functionality
-- No automated testing in initial implementation
-- Each batch should be completed in a single conversation session
-- If context window becomes an issue, start a fresh conversation using the provided templates
+## Alert System Configuration
+
+- **Critical Threshold**: Heart rate >160 BPM triggers immediate email alert
+- **Email Template**: Includes member name, metric value, and timestamp
+- **Notification Target**: Primary caregiver receives all alerts
+- **Frequency**: Real-time alerts (not batched) for emergency response

@@ -46,15 +46,15 @@ cat data/profiles.json
 ```
 
 **Visual Verification:**
-- [x] Open project directory and verify folder structure exists
-- [x] Check `data/profiles.json` contains 3 family members with id, name, email fields
-- [x] Confirm `package.json` includes googleapis, nodemailer, express dependencies
+- [x ] Open project directory and verify folder structure exists
+- [ x] Check `data/profiles.json` contains 3 family members with id, name, email fields
+- [x ] Confirm `package.json` includes googleapis, nodemailer, express dependencies
 
 **Success Criteria:** Project structure created with all required directories and configuration files in place.
 
 ---
 
-### Task 2: shadcn/ui Dashboard Setup  
+### Task 2: shadcn/ui Dashboard Setup
 **Status:** ✅
 **Implementation Checklist:**
 - [x] Install Tailwind CSS and shadcn/ui dependencies
@@ -65,7 +65,7 @@ cat data/profiles.json
 **Manual Test Commands:**
 ```bash
 # Test command 1
-npx tailwindcss -i ./src/input.css -o ./public/output.css --watch
+npx tailwindcss -i ./src/input.css -o ./public/output.css
 # Expected output: Tailwind CSS builds successfully
 
 # Test command 2
