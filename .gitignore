@@ -12,6 +12,10 @@ config/google-oauth2-credentials.json
 config/*.json
 !config/*.example.json
 
+# Token storage - NEVER COMMIT THESE
+data/.tokens.json
+.tokens.json
+
 # OS generated files
 .DS_Store
 .DS_Store?

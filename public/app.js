@@ -53,6 +53,23 @@ function updateHealthCard(memberId, healthData) {
             `${healthData.latestSleep} hrs` : '-- hrs';
     }
     
+    // Update blood pressure
+    const bpElement = document.getElementById(`member${cardNumber}-bp`);
+    if (bpElement) {
+        if (healthData.latestBloodPressureSystolic && healthData.latestBloodPressureDiastolic) {
+            bpElement.textContent = `${Math.round(healthData.latestBloodPressureSystolic)}/${Math.round(healthData.latestBloodPressureDiastolic)} mmHg`;
+        } else {
+            bpElement.textContent = '--/-- mmHg';
+        }
+    }
+    
+    // Update oxygen saturation
+    const o2Element = document.getElementById(`member${cardNumber}-o2`);
+    if (o2Element) {
+        o2Element.textContent = healthData.latestOxygenSaturation ? 
+            `${Math.round(healthData.latestOxygenSaturation)}%` : '--%';
+    }
+    
     // Update last updated timestamp
     const updatedElement = document.getElementById(`member${cardNumber}-updated`);
     if (updatedElement) {
@@ -83,4 +100,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up automatic refresh every 5 minutes
     setInterval(refreshDashboard, 300000); // 5 minutes = 300000ms
+    
+    // Set up card click handlers for navigation
+    setupCardClickHandlers();
 });
+
+// Set up click handlers to navigate to member detail pages
+function setupCardClickHandlers() {
+    // Add click handlers to all member cards
+    const memberCards = ['member1', 'member2', 'member3'];
+    
+    memberCards.forEach(memberId => {
+        const cardElement = document.querySelector(`[data-member-id="${memberId}"]`);
+        if (cardElement) {
+            cardElement.style.cursor = 'pointer';
+            cardElement.addEventListener('click', () => {
+                window.location.href = `/member-detail.html?member=${memberId}`;
+            });
+        } else {
+            // Fallback: Try to find card by ID pattern
+            const fallbackCard = document.getElementById(`${memberId}-card`);
+            if (fallbackCard) {
+                fallbackCard.style.cursor = 'pointer';
+                fallbackCard.addEventListener('click', () => {
+                    window.location.href = `/member-detail.html?member=${memberId}`;
+                });
+            }
+        }
+    });
+    
+    // Also add hover effects
+    const style = document.createElement('style');
+    style.textContent = `
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        .member-card {
+            transition: all 0.2s ease;
+        }
+    `;
+    document.head.appendChild(style);
+}

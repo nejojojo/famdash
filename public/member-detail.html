@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Details - Family Health Dashboard</title>
+    <link href="output.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Dashboard</a>
+                </div>
+                <div class="flex items-center">
+                    <h1 class="text-lg font-semibold text-gray-900" id="page-title">Health Details</h1>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Member Info Header -->
+        <div class="px-4 py-4 sm:px-0">
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
+                <div class="flex flex-col space-y-1.5 pb-4 border-b border-gray-100">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-lg font-bold text-blue-600" id="member-initials">NB</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-semibold leading-none tracking-tight text-blue-600" id="member-name">Loading...</h2>
+                            <p class="text-sm text-gray-500" id="member-email">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-6 space-y-4">
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-sm font-medium text-gray-600">Heart Rate:</span>
+                        <span class="text-lg font-semibold text-gray-900" id="current-heart-rate">-- BPM</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-t border-gray-50">
+                        <span class="text-sm font-medium text-gray-600">Steps:</span>
+                        <span class="text-lg font-semibold text-gray-900" id="current-steps">--</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-t border-gray-50">
+                        <span class="text-sm font-medium text-gray-600">Sleep:</span>
+                        <span class="text-lg font-semibold text-gray-900" id="current-sleep">-- hrs</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-t border-gray-50">
+                        <span class="text-sm font-medium text-gray-600">Blood Pressure:</span>
+                        <span class="text-lg font-semibold text-gray-900" id="current-bp">--/-- mmHg</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-t border-gray-50">
+                        <span class="text-sm font-medium text-gray-600">Oxygen Sat:</span>
+                        <span class="text-lg font-semibold text-gray-900" id="current-o2">--%</span>
+                    </div>
+                    <div class="pt-4 text-xs text-gray-500 text-center">
+                        Last updated: <span id="last-updated">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Charts -->
+        <div class="px-4 sm:px-0">
+            <!-- Time Period Selector -->
+            <div class="mb-6">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900">Health Metrics - This Month</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700" id="period-month">This Month</button>
+                            <button class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" id="period-week">This Week</button>
+                            <button class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" id="period-year">This Year</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Heart Rate Chart -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Heart Rate</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600">BPM</span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="heart-rate-chart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Average: <span id="hr-avg" class="font-semibold">--</span> BPM</span>
+                            <span>Max: <span id="hr-max" class="font-semibold">--</span> BPM</span>
+                            <span>Min: <span id="hr-min" class="font-semibold">--</span> BPM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps Chart -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Daily Steps</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600">Steps</span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="steps-chart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Average: <span id="steps-avg" class="font-semibold">--</span> steps</span>
+                            <span>Max: <span id="steps-max" class="font-semibold">--</span> steps</span>
+                            <span>Total: <span id="steps-total" class="font-semibold">--</span> steps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sleep Chart -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Sleep Duration</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600">Hours</span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="sleep-chart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Average: <span id="sleep-avg" class="font-semibold">--</span> hrs</span>
+                            <span>Max: <span id="sleep-max" class="font-semibold">--</span> hrs</span>
+                            <span>Min: <span id="sleep-min" class="font-semibold">--</span> hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blood Pressure Chart -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Blood Pressure</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600">Systolic</span>
+                            <div class="w-3 h-3 bg-blue-500 rounded-full ml-2"></div>
+                            <span class="text-sm text-gray-600">Diastolic</span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="blood-pressure-chart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Latest: <span id="bp-latest" class="font-semibold">--/-- mmHg</span></span>
+                            <span>Avg Systolic: <span id="bp-sys-avg" class="font-semibold">--</span> mmHg</span>
+                            <span>Avg Diastolic: <span id="bp-dia-avg" class="font-semibold">--</span> mmHg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oxygen Saturation Chart -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Oxygen Saturation</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600">SpO2 %</span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="oxygen-saturation-chart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Average: <span id="o2-avg" class="font-semibold">--%</span></span>
+                            <span>Max: <span id="o2-max" class="font-semibold">--%</span></span>
+                            <span>Min: <span id="o2-min" class="font-semibold">--%</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Summary -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Monthly Summary</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-gray-900">Heart Rate Alerts</span>
+                            </div>
+                            <span class="text-sm font-bold text-red-600" id="hr-alerts">0</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-gray-900">Active Days</span>
+                            </div>
+                            <span class="text-sm font-bold text-blue-600" id="active-days">0</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-gray-900">Good Sleep Days</span>
+                            </div>
+                            <span class="text-sm font-bold text-purple-600" id="good-sleep-days">0</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-gray-900">Health Score</span>
+                            </div>
+                            <span class="text-sm font-bold text-green-600" id="health-score">--/100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+            <div class="flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span class="text-gray-900">Loading health data...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="member-detail.js"></script>
+</body>
+</html>

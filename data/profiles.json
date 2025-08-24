@@ -4,12 +4,19 @@
       "id": "member1",
       "name": "Nezo Benardi",
       "email": "nezobenardi@gmail.com",
-      "googleFitToken": null,
+      "googleFitToken": "VALID_TOKEN",
       "latestHeartRate": 0,
-      "latestSteps": 195,
+      "latestSteps": 0,
       "latestSleep": 0,
-      "lastUpdated": "2025-08-24T09:26:50.516Z",
-      "heartRateTimestamp": null
+      "latestBloodPressureSystolic": 0,
+      "latestBloodPressureDiastolic": 0,
+      "latestOxygenSaturation": 0,
+      "lastUpdated": "2025-08-24T20:49:42.149Z",
+      "heartRateTimestamp": null,
+      "bloodPressureTimestamp": null,
+      "oxygenSaturationTimestamp": null,
+      "tokenStatus": "active",
+      "lastTokenCheck": "2025-08-24T20:49:42.150Z"
     },
     {
       "id": "member2",
@@ -19,7 +26,14 @@
       "latestHeartRate": 68,
       "latestSteps": 12000,
       "latestSleep": 8,
-      "lastUpdated": "2025-08-23T10:00:00Z"
+      "latestBloodPressureSystolic": 120,
+      "latestBloodPressureDiastolic": 80,
+      "latestOxygenSaturation": 98,
+      "lastUpdated": "2025-08-23T10:00:00Z",
+      "bloodPressureTimestamp": "2025-08-23T09:30:00Z",
+      "oxygenSaturationTimestamp": "2025-08-23T09:35:00Z",
+      "tokenStatus": "expired",
+      "lastTokenCheck": "2025-08-24T20:49:42.151Z"
     },
     {
       "id": "member3",
@@ -29,7 +43,14 @@
       "latestHeartRate": 72,
       "latestSteps": 6800,
       "latestSleep": 6.5,
-      "lastUpdated": "2025-08-23T10:00:00Z"
+      "latestBloodPressureSystolic": 135,
+      "latestBloodPressureDiastolic": 85,
+      "latestOxygenSaturation": 96,
+      "lastUpdated": "2025-08-23T10:00:00Z",
+      "bloodPressureTimestamp": "2025-08-23T09:45:00Z",
+      "oxygenSaturationTimestamp": "2025-08-23T09:50:00Z",
+      "tokenStatus": "expired",
+      "lastTokenCheck": "2025-08-24T20:49:42.151Z"
     }
   ]
 }
