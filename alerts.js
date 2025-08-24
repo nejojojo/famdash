@@ -43,7 +43,7 @@ function scanAllMembers() {
         
         const alerts = [];
         
-        profiles.familyMembers.forEach(member => {
+        profiles.members.forEach(member => {
             const alert = checkHealthThresholds(member);
             if (alert) {
                 alerts.push(alert);
@@ -139,7 +139,7 @@ async function performThresholdCheck() {
                 const profilesData = fs.readFileSync(profilesPath, 'utf8');
                 const profiles = JSON.parse(profilesData);
                 
-                const member = profiles.familyMembers.find(m => m.id === alert.memberId);
+                const member = profiles.members.find(m => m.id === alert.memberId);
                 if (member) {
                     await sendEmergencyAlert(member, 'heart rate', alert.currentValue);
                 }
