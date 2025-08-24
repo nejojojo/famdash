@@ -4,7 +4,7 @@
       "id": "member1",
       "name": "Nezo Benardi",
       "email": "nezobenardi@gmail.com",
-      "googleFitToken": "<ACCESS_TOKEN_REMOVED>",
+      "googleFitToken": null,
       "latestHeartRate": 0,
       "latestSteps": 195,
       "latestSleep": 0,
