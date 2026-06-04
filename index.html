@@ -5,59 +5,333 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Family Health Analyst</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
 <style>
-  :root { --bg:#0f1115; --card:#1a1d24; --ink:#e7e9ee; --muted:#aeb6c2; --green:#3fb950; --amber:#e3a92b; --grey:#8b93a1; }
+  :root {
+    --canvas:#e9edf0;       /* soft warm-grey page */
+    --shell:#ffffff;        /* floating white container */
+    --card:#ffffff;
+    --soft:#f4f7f8;         /* soft fill */
+    --mint:#eef6f4;         /* sage/mint tint */
+    --ink:#1f2b30;
+    --ink2:#3c4c53;
+    --muted:#7d8b92;
+    --faint:#9aa6ac;
+    --line:#e7edef;
+    --teal:#4a9d8e;
+    --teal-2:#5bb0a0;
+    --teal-deep:#2f6b62;
+    --green:#4aa37a;        /* calm "all clear" */
+    --amber:#d9a23a;        /* warm "worth a check-in" */
+    --grey:#9aa6ac;         /* no data */
+    --shadow:0 8px 24px rgba(20,40,60,.06);
+    --shadow-lg:0 16px 40px rgba(20,40,60,.10);
+    --r:18px;
+    --r-sm:12px;
+  }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui, sans-serif; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sim { color: var(--amber); font-size: 13px; margin-bottom: 12px; font-weight:600; }
-  .controls { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-  .controls label { color:var(--muted); font-size:13px; }
-  select { background:var(--card); color:var(--ink); border:1px solid #2a2e37; border-radius:8px; padding:6px 10px; font:inherit; }
-  .controls .nav { background:var(--card); color:var(--ink); border:1px solid #2a2e37; border-radius:8px; padding:6px 10px; cursor:pointer; }
-  .controls .nav:disabled { opacity:.4; cursor:default; }
-  .hint { color:var(--grey); font-size:12px; }
-  .legend { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
-  .report { background: var(--card); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; }
-  .report h2 { margin: 0 0 10px; font-size: 18px; }
-  .rmember { padding: 8px 0; border-top: 1px solid #2a2e37; }
-  .rmember:first-of-type { border-top: 0; }
-  .status { font-weight: 600; }
-  .s-all_clear { color: var(--green); } .s-worth_noting { color: var(--amber); } .s-no_data { color: var(--grey); }
-  .signals { color: var(--muted); font-size: 13px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap: 18px; }
-  .card { background: var(--card); border-radius: 12px; padding: 16px; border-left: 4px solid transparent; }
-  .card.flag-worth_noting { border-left-color: var(--amber); }
-  .card.flag-no_data { border-left-color: var(--grey); }
-  .card h3 { margin: 0 0 4px; }
-  .card .sub { color: var(--grey); font-size: 12px; margin: 0 0 12px; }
-  .metric-row { display:flex; justify-content: space-between; font-size: 13px; padding: 2px 0; }
-  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
-  .tier { font-size:11px; color:var(--muted); margin-left:4px; }
-  .chart-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-  canvas { background:#0c0e12; border-radius:8px; padding:4px; }
-  footer { color: var(--muted); font-size: 12px; margin-top: 28px; }
-  .error { background: var(--card); border-radius:12px; padding:18px 20px; }
+  html, body { margin:0; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 22px 22px 40px; }
+
+  /* ── Floating white shell ─────────────────────────────── */
+  .shell {
+    background: var(--shell);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    padding: 22px 26px 30px;
+  }
+
+  /* ── Top nav ──────────────────────────────────────────── */
+  .nav {
+    display: flex; align-items: center; gap: 18px;
+    padding-bottom: 18px; border-bottom: 1px solid var(--line);
+  }
+  .brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:18px; letter-spacing:-.2px; }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--teal-2), var(--teal-deep));
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff; font-size:14px; box-shadow: 0 4px 10px rgba(47,107,98,.35);
+  }
+  .navlinks { display:flex; gap:22px; margin: 0 auto; font-size:14px; }
+  .navlinks a { color: var(--muted); text-decoration:none; padding:4px 2px; }
+  .navlinks a.active { color: var(--ink); font-weight:600; position:relative; }
+  .navlinks a.active::after {
+    content:""; position:absolute; left:0; right:0; bottom:-19px; height:2px;
+    background: var(--teal); border-radius:2px;
+  }
+  .userchip { display:flex; align-items:center; gap:10px; }
+  .userchip .avatar {
+    width:38px; height:38px; border-radius:50%;
+    background: linear-gradient(135deg, var(--teal-2), var(--teal-deep));
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;
+  }
+  .userchip .u-name { font-size:14px; font-weight:600; line-height:1.2; }
+  .userchip .u-sub { font-size:11px; color: var(--faint); }
+
+  /* ── Greeting + vitals strip ──────────────────────────── */
+  .greet { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin: 26px 0 6px; }
+  .greet h1 { font-size: 30px; font-weight: 600; letter-spacing:-.5px; margin:0; color: var(--ink); }
+
+  /* ── Synthetic notice ─────────────────────────────────── */
+  .sim { color: var(--amber); font-size: 13px; font-weight:600; margin: 16px 0 0; display:none; }
+  .sim:not(:empty) { display:flex; align-items:center; gap:8px;
+    background:#fbf4e6; border:1px solid #f0e2c2; padding:9px 13px; border-radius:10px; }
+
+  /* ── Day controls (in nav-ish toolbar) ────────────────── */
+  .controls { display:flex; align-items:center; gap:10px; margin: 18px 0 4px; flex-wrap:wrap; }
+  .controls label { color: var(--muted); font-size:13px; }
+  select {
+    background:#fff; color:var(--ink); border:1px solid var(--line);
+    border-radius:10px; padding:7px 11px; font:inherit; box-shadow: var(--shadow);
+  }
+  .controls .navbtn {
+    background:#fff; color:var(--ink2); border:1px solid var(--line);
+    border-radius:10px; padding:7px 12px; cursor:pointer; box-shadow: var(--shadow); font:inherit;
+  }
+  .controls .navbtn:hover:not(:disabled) { background: var(--mint); }
+  .controls .navbtn:disabled { opacity:.4; cursor:default; }
+  .hint { color: var(--faint); font-size:12px; }
+
+  .legend { color: var(--muted); font-size: 12.5px; margin: 14px 0 20px; display:flex; align-items:center; gap:7px; }
+
+  /* ── Report card (teal gradient feature) ──────────────── */
+  .report {
+    background: linear-gradient(135deg, var(--teal-2) 0%, var(--teal-deep) 100%);
+    color:#eafaf6;
+    border-radius: var(--r); padding: 22px 26px; margin-bottom: 22px;
+    box-shadow: 0 14px 34px rgba(47,107,98,.28);
+  }
+  .report .r-eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:.6px; opacity:.8; margin:0 0 6px; }
+  .report h2 { margin: 0 0 4px; font-size: 22px; font-weight:600; color:#fff; letter-spacing:-.3px; }
+  .report .r-date { font-weight:400; opacity:.85; font-size:15px; }
+  .report .rmembers { margin-top:16px; display:grid; gap:1px; background: rgba(255,255,255,.16); border-radius:12px; overflow:hidden; }
+  .rmember { padding: 12px 16px; background: rgba(255,255,255,.10); }
+  .rmember .rm-head { font-weight:600; color:#fff; }
+  .rmember .rm-summary { color:#e3f4ef; }
+  .status-pill {
+    display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px;
+    margin-right:9px; vertical-align:middle;
+  }
+  .sp-all_clear { background: rgba(255,255,255,.22); color:#fff; }
+  .sp-worth_noting { background: var(--amber); color:#3a2b08; }
+  .sp-no_data { background: rgba(255,255,255,.16); color:#dfece9; }
+  .report .signals { color:#d3ece6; font-size:13px; margin-top:4px; }
+  /* report-as-error / unavailable fallback uses neutral white card */
+  .report.report--plain {
+    background:#fff; color:var(--ink); box-shadow: var(--shadow);
+    border:1px solid var(--line);
+  }
+  .report.report--plain h2 { color: var(--ink); }
+  .report.report--plain .signals { color: var(--muted); }
+
+  /* ── Section heading ──────────────────────────────────── */
+  .section-h { display:flex; align-items:center; gap:9px; margin: 4px 0 14px; font-size:13px; color: var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase; }
+
+  /* ── Member cards ─────────────────────────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px,1fr)); gap: 18px; }
+  .card {
+    background: var(--card); border-radius: var(--r); padding: 20px 20px 16px;
+    box-shadow: var(--shadow); border:1px solid var(--line); position:relative; overflow:hidden;
+  }
+  .card::before {
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background: transparent;
+  }
+  .card.flag-worth_noting::before { background: var(--amber); }
+  .card.flag-no_data::before { background: var(--grey); }
+  .card .c-head { display:flex; align-items:center; gap:11px; margin-bottom: 14px; }
+  .card .c-avatar {
+    width:38px; height:38px; border-radius:12px; background: var(--mint);
+    display:flex; align-items:center; justify-content:center; font-weight:600; color: var(--teal-deep);
+  }
+  .card h3 { margin: 0; font-size: 16px; font-weight:600; }
+  .card .sub { color: var(--faint); font-size: 12px; margin: 1px 0 0; }
+  .card .c-badge {
+    margin-left:auto; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px;
+  }
+  .cb-all_clear { background: var(--mint); color: var(--teal-deep); }
+  .cb-worth_noting { background:#fbf1dc; color:#9a6f15; }
+  .cb-no_data { background:#eef1f3; color: var(--muted); }
+
+  .metric-row {
+    display:flex; justify-content: space-between; align-items:center;
+    font-size: 13.5px; padding: 8px 0; border-top:1px solid var(--line);
+  }
+  .metric-row:first-of-type { border-top:0; }
+  .metric-row .m-name { color: var(--ink2); }
+  .metric-row .m-val { color: var(--ink); font-weight:600; }
+  .metric-row .m-sigma { color: var(--faint); font-weight:400; font-size:12px; margin-left:4px; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+  .tier { font-size:11px; color:var(--faint); margin-left:7px; }
+
+  .chart-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .chart-cell { background: var(--soft); border-radius: var(--r-sm); padding: 8px 8px 6px; height: 118px; }
+  .chart-cell canvas { display:block; width:100% !important; height:100% !important; }
+
+  footer { color: var(--muted); font-size: 12.5px; margin-top: 26px; padding-top:16px; border-top:1px solid var(--line); }
+
+  /* ── Error state ──────────────────────────────────────── */
+  .error { background:#fff; border-radius: var(--r); padding:22px 26px; box-shadow: var(--shadow); border:1px solid var(--line); }
   .error h2 { margin:0 0 8px; font-size:18px; }
+  .error .signals { color: var(--muted); }
+
+  /* ── Report header + Telegram button ──────────────────── */
+  .r-top { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:6px; }
+  .tg-btn {
+    display:inline-flex; align-items:center; gap:7px; flex-shrink:0;
+    background: rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.28);
+    border-radius:999px; padding:8px 15px; font:inherit; font-size:13px; font-weight:600;
+    cursor:pointer; backdrop-filter: blur(2px); transition: background .15s;
+  }
+  .tg-btn:hover { background: rgba(255,255,255,.28); }
+  .report--plain .tg-btn { background: var(--mint); color: var(--teal-deep); border-color: transparent; }
+  .report--plain .tg-btn:hover { background:#e1efec; }
+
+  /* ── Modal ────────────────────────────────────────────── */
+  .modal-backdrop {
+    position:fixed; inset:0; background: rgba(18,32,38,.42); backdrop-filter: blur(2px);
+    display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .modal-backdrop[hidden] { display:none; }
+  .modal {
+    background:#fff; border-radius:20px; box-shadow: var(--shadow-lg);
+    width:100%; max-width:380px; padding:24px 24px 22px; position:relative;
+    max-height: calc(100vh - 40px); overflow:auto;
+  }
+  .modal-x {
+    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--line); background:#fff; color:var(--muted); font-size:18px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .modal-x:hover { background: var(--soft); }
+  .modal-title { margin:0 0 4px; font-size:19px; font-weight:600; letter-spacing:-.3px; }
+  .modal-sec { margin-top:20px; padding-top:18px; border-top:1px solid var(--line); }
+  .modal-sec:first-of-type { border-top:0; padding-top:0; margin-top:14px; }
+  .modal-sec h3 { margin:0 0 3px; font-size:14px; font-weight:600; }
+  .modal-help { margin:0 0 12px; color: var(--muted); font-size:12.5px; line-height:1.45; }
+  .qr-wrap { display:flex; justify-content:center; padding:14px; background: var(--soft); border-radius:14px; }
+  .qr-wrap img, .qr-wrap canvas { display:block; border-radius:6px; }
+  .modal-link {
+    display:inline-block; margin-top:12px; color: var(--teal-deep); font-weight:600;
+    font-size:13px; text-decoration:none;
+  }
+  .modal-link:hover { text-decoration:underline; }
+  .tg-run {
+    width:100%; background: linear-gradient(135deg, var(--teal-2), var(--teal-deep)); color:#fff;
+    border:0; border-radius:12px; padding:11px 16px; font:inherit; font-size:14px; font-weight:600;
+    cursor:pointer; box-shadow: 0 8px 20px rgba(47,107,98,.28);
+  }
+  .tg-run:hover { filter: brightness(1.04); }
+  .tg-run:disabled { opacity:.6; cursor:default; box-shadow:none; }
+  .modal-status { margin:10px 0 0; font-size:13px; min-height:1px; }
+  .modal-status.ok { color: var(--green); }
+  .modal-status.err { color:#c0532b; }
+  .modal-adv { margin-top:12px; }
+  .modal-adv summary { cursor:pointer; color: var(--muted); font-size:12.5px; user-select:none; }
+  .modal-adv summary:hover { color: var(--ink2); }
+  .modal-input {
+    width:100%; margin-top:8px; box-sizing:border-box; border:1px solid var(--line);
+    border-radius:10px; padding:9px 11px; font:inherit; font-size:13px; color: var(--ink); background:#fff;
+  }
+  .modal-input:focus { outline:none; border-color: var(--teal-2); box-shadow:0 0 0 3px rgba(91,176,160,.18); }
+  .modal-adv code { background: var(--soft); padding:1px 5px; border-radius:5px; font-size:12px; }
+
+  @media (max-width: 640px) {
+    .navlinks { display:none; }
+    .greet h1 { font-size:24px; }
+    .r-top { flex-wrap:wrap; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Family Health Analyst</h1>
+<div class="page">
+ <div class="shell">
+
+  <!-- Top nav -->
+  <nav class="nav">
+    <div class="brand"><span class="mark">✦</span> Famdash</div>
+    <div class="navlinks">
+      <a href="#" class="active">Dashboard</a>
+    </div>
+    <div class="userchip">
+      <div class="avatar">F</div>
+      <div>
+        <div class="u-name">Family</div>
+        <div class="u-sub">daily glance</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Greeting -->
+  <div class="greet">
+    <div>
+      <h1>Welcome back</h1>
+    </div>
+  </div>
+
+  <!-- Synthetic-data notice -->
   <div class="sim" id="sim"></div>
+
+  <!-- Day navigation -->
   <div class="controls" id="controls" style="display:none">
-    <button class="nav" id="prev" title="Previous day">‹ Prev</button>
-    <label for="daysel">Day:</label>
+    <button class="navbtn" id="prev" title="Previous day">‹ Prev</button>
+    <label for="daysel">Day</label>
     <select id="daysel"></select>
-    <button class="nav" id="next" title="Next day">Next ›</button>
+    <button class="navbtn" id="next" title="Next day">Next ›</button>
     <span class="hint" id="dayhint"></span>
   </div>
+
+  <!-- Legend explainer -->
   <div class="legend" id="legend"></div>
+
+  <!-- Report (teal gradient feature card) -->
   <div class="report" id="report">Loading…</div>
+
+  <!-- Per-member cards -->
+  <div class="section-h">Family members</div>
   <div class="cards" id="cards"></div>
+
   <footer id="footer"></footer>
+ </div>
 </div>
+
+<!-- Telegram modal -->
+<div class="modal-backdrop" id="tgModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Telegram daily report">
+    <button class="modal-x" id="tgClose" aria-label="Close" title="Close">×</button>
+    <h2 class="modal-title">Telegram daily report</h2>
+
+    <section class="modal-sec">
+      <h3>Join the family group</h3>
+      <p class="modal-help">Scan the code with your phone to open the group in Telegram.</p>
+      <div class="qr-wrap"><div id="tgQr"></div></div>
+      <a class="modal-link" id="tgLink" href="#" target="_blank" rel="noopener">Open in Telegram ↗</a>
+      <details class="modal-adv">
+        <summary>Change invite link</summary>
+        <input class="modal-input" id="tgInvite" type="url" placeholder="https://t.me/+…" autocomplete="off" />
+      </details>
+    </section>
+
+    <section class="modal-sec">
+      <h3>Send today's report now</h3>
+      <p class="modal-help">Triggers the GitHub Action that runs the analyst and posts the report to the bot. It lands in the group in 1–2 minutes.</p>
+      <button class="tg-run" id="tgRun">Run now</button>
+      <p class="modal-status" id="tgStatus" role="status"></p>
+      <details class="modal-adv" id="tgTokenWrap">
+        <summary>GitHub token</summary>
+        <p class="modal-help">A personal access token with the <code>workflow</code> (Actions: write) scope on <code>nejojojo/famdash</code>. Stored only in this browser (localStorage), never sent anywhere but GitHub.</p>
+        <input class="modal-input" id="tgPat" type="password" placeholder="github_pat_… or ghp_…" autocomplete="off" />
+      </details>
+    </section>
+  </div>
+</div>
+
 <script type="module">
 const METRICS = ['rhr','sleep_eff','steps','hrv'];
 const META = {
@@ -71,7 +345,7 @@ const STATUS_ORDER = { worth_noting:0, no_data:1, all_clear:2 };
 
 function z(v, b){ if(v==null||!b||b.mean==null) return null; if(!b.std) return 0; return (v-b.mean)/b.std; }
 function tier(zv){ return (zv!=null && Math.abs(zv) >= 1.5) ? 'out' : 'in'; }
-function tierColor(t){ return t==='out' ? '#e3a92b' : '#3fb950'; }
+function tierColor(t){ return t==='out' ? '#d9a23a' : '#4aa37a'; }
 function tierGlyph(t){ return t==='out' ? '▲' : '○'; }
 function tierWord(t){ return t==='out' ? 'watch' : 'normal'; }
 function daysSinceSync(mem){
@@ -109,24 +383,37 @@ function render(data){
 
   document.getElementById('sim').textContent =
     data.simulated ? '⚠︎ Synthetic demo data — not real health measurements; no action needed.' : '';
-  document.getElementById('legend').textContent =
-    'Each dot reflects how that day compares to the person’s own normal range: ○ normal, ▲ worth a look.';
+  document.getElementById('legend').innerHTML =
+    'Each dot reflects how that day compares to the person’s own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.';
 
   if (!data.report || data.report_valid === false){
-    reportEl.innerHTML = `<h2>Summary unavailable for this day</h2>
+    reportEl.className = 'report report--plain';
+    reportEl.innerHTML = `
+      <div class="r-top">
+        <p class="r-eyebrow">Daily family report</p>
+        <button type="button" class="tg-btn" id="tgOpen">📩 Get telegram daily report</button>
+      </div>
+      <h2>Summary unavailable for this day</h2>
       <p class="signals">The analyst report couldn't be generated for this run. The trends below are still shown.</p>`;
   } else {
     const rep = data.report;
     reportEl.innerHTML = `
-      <h2>${rep.headline} <span style="color:var(--muted);font-weight:400">— ${rep.date}</span></h2>
+      <div class="r-top">
+        <p class="r-eyebrow">Daily family report</p>
+        <button type="button" class="tg-btn" id="tgOpen">📩 Get telegram daily report</button>
+      </div>
+      <h2>${rep.headline} <span class="r-date">— ${rep.date}</span></h2>
+      <div class="rmembers">
       ${rep.members.map(m=>{
         const phrases = (m.changed_signals||[]).map(s=> (s && typeof s==='object') ? s.phrase : s).filter(Boolean);
         return `<div class="rmember">
-          <span class="status s-${m.status}">${m.name}: ${STATUS_LABEL[m.status]||m.status}</span> — ${m.summary}
+          <span class="rm-head"><span class="status-pill sp-${m.status}">${STATUS_LABEL[m.status]||m.status}</span>${m.name}</span>
+          <span class="rm-summary"> — ${m.summary}</span>
           ${phrases.length?`<div class="signals">${phrases.join('; ')}</div>`:''}
           ${m.suggestion?`<div class="signals">↳ ${m.suggestion}</div>`:''}
         </div>`;
-      }).join('')}`;
+      }).join('')}
+      </div>`;
   }
 
   const statusByName = Object.fromEntries((data.report?.members||[]).map(m=>[m.name, m.status]));
@@ -147,13 +434,21 @@ function render(data){
       const shown = v==null ? '—' : v;
       const sigma = zv==null ? '' : `(${zv>=0?'+':''}${zv.toFixed(1)}σ)`;
       return `<div class="metric-row">
-        <span><span class="dot" style="background:${zv==null?'#8b93a1':tierColor(t)}" aria-hidden="true"></span>${META[metric].label}</span>
-        <span>${shown} ${META[metric].unit} ${sigma}<span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span></span>
+        <span class="m-name"><span class="dot" style="background:${zv==null?'#9aa6ac':tierColor(t)}" aria-hidden="true"></span>${META[metric].label}</span>
+        <span class="m-val">${shown} ${META[metric].unit} <span class="m-sigma">${sigma}</span><span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span></span>
       </div>`;
     }).join('');
+    const badge = status ? `<span class="c-badge cb-${status}">${STATUS_LABEL[status]||status}</span>` : '';
     const sub = mem.today ? '' : `<p class="sub">last synced ${gap} day${gap===1?'':'s'} ago</p>`;
-    card.innerHTML = `<h3>${mem.name}</h3>${sub}
-      ${rows}<div class="chart-grid">${METRICS.map(m=>`<canvas id="c-${mem.id}-${m}" height="120" aria-label="${mem.name} ${META[m].label} 30-day trend"></canvas>`).join('')}</div>`;
+    const initial = (mem.name||'?').trim().charAt(0).toUpperCase();
+    card.innerHTML = `
+      <div class="c-head">
+        <div class="c-avatar">${initial}</div>
+        <div><h3>${mem.name}</h3>${sub}</div>
+        ${badge}
+      </div>
+      ${rows}
+      <div class="chart-grid">${METRICS.map(m=>`<div class="chart-cell"><canvas id="c-${mem.id}-${m}" height="120" aria-label="${mem.name} ${META[m].label} 30-day trend"></canvas></div>`).join('')}</div>`;
     cards.appendChild(card);
 
     if (typeof Chart === 'undefined') continue;
@@ -166,12 +461,16 @@ function render(data){
       charts.push(new Chart(document.getElementById(`c-${mem.id}-${metric}`), {
         type:'line',
         data:{ labels, datasets:[
-          { label:'+1σ', data:band(1), borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(88,166,255,0.10)' },
+          { label:'+1σ', data:band(1), borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(74,157,142,0.12)' },
           { label:'-1σ', data:band(-1), borderWidth:0, pointRadius:0, fill:false },
-          { label:META[metric].label, data:values, borderColor:'#58a6ff', borderWidth:2, pointRadius:1, tension:0.25, spanGaps:false },
+          { label:META[metric].label, data:values, borderColor:'#4a9d8e', borderWidth:2, pointRadius:1, pointBackgroundColor:'#4a9d8e', tension:0.3, spanGaps:false },
         ]},
-        options:{ animation:false, plugins:{legend:{display:false}, title:{display:true,text:META[metric].label,color:'#aeb6c2'}},
-          scales:{ x:{ticks:{color:'#8b93a1',maxTicksLimit:6}}, y:{ticks:{color:'#8b93a1'}} } }
+        options:{ animation:false, responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, title:{display:true,text:META[metric].label,color:'#7d8b92',font:{size:11,weight:'600'}} },
+          scales:{
+            x:{ grid:{display:false}, border:{display:false}, ticks:{color:'#9aa6ac',maxTicksLimit:5,font:{size:10}} },
+            y:{ grid:{color:'#eef2f4'}, border:{display:false}, ticks:{color:'#9aa6ac',font:{size:10}} }
+          } }
       }));
     }
   }
@@ -224,6 +523,109 @@ async function main(){
 }
 
 main();
+
+// ── Telegram daily-report modal ──────────────────────────────────────────────
+const TG = {
+  repo: 'nejojojo/famdash',
+  workflow: 'daily.yml',
+  branch: 'main',
+  defaultInvite: 'https://t.me/+OQPd8lsZ7ERkMzk1',
+  kInvite: 'famdash_tg_invite',
+  kPat: 'famdash_gh_pat',
+};
+
+const tgModal  = document.getElementById('tgModal');
+const tgQr     = document.getElementById('tgQr');
+const tgLink   = document.getElementById('tgLink');
+const tgInvite = document.getElementById('tgInvite');
+const tgPat    = document.getElementById('tgPat');
+const tgRun    = document.getElementById('tgRun');
+const tgStatus = document.getElementById('tgStatus');
+
+function tgInviteUrl(){
+  return (localStorage.getItem(TG.kInvite) || TG.defaultInvite).trim();
+}
+
+function renderQr(url){
+  tgQr.innerHTML = '';
+  tgLink.href = url || '#';
+  if (!url) return;
+  if (typeof QRCode !== 'undefined'){
+    new QRCode(tgQr, { text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    // CDN lib unavailable — fall back to a rendered QR image (invite link is not secret)
+    const img = new Image(200, 200);
+    img.alt = 'Telegram group QR code';
+    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+    tgQr.appendChild(img);
+  }
+}
+
+function openTgModal(){
+  tgInvite.value = localStorage.getItem(TG.kInvite) || TG.defaultInvite;
+  tgPat.value = localStorage.getItem(TG.kPat) || '';
+  tgStatus.textContent = ''; tgStatus.className = 'modal-status';
+  renderQr(tgInviteUrl());
+  tgModal.hidden = false;
+}
+function closeTgModal(){ tgModal.hidden = true; }
+
+// Open button is re-created on every render() — use event delegation.
+document.addEventListener('click', (e) => { if (e.target.closest('#tgOpen')) openTgModal(); });
+
+document.getElementById('tgClose').onclick = closeTgModal;
+tgModal.addEventListener('click', (e) => { if (e.target === tgModal) closeTgModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !tgModal.hidden) closeTgModal(); });
+
+tgInvite.addEventListener('input', () => {
+  localStorage.setItem(TG.kInvite, tgInvite.value.trim());
+  renderQr(tgInviteUrl());
+});
+tgPat.addEventListener('input', () => localStorage.setItem(TG.kPat, tgPat.value.trim()));
+
+tgRun.onclick = async () => {
+  const pat = (tgPat.value || '').trim();
+  if (!pat){
+    tgStatus.className = 'modal-status err';
+    tgStatus.textContent = 'Add a GitHub token below first, then press Run now.';
+    document.getElementById('tgTokenWrap').open = true;
+    return;
+  }
+  localStorage.setItem(TG.kPat, pat);
+  tgRun.disabled = true;
+  tgStatus.className = 'modal-status';
+  tgStatus.textContent = 'Triggering the workflow…';
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${TG.repo}/actions/workflows/${TG.workflow}/dispatches`,
+      { method:'POST',
+        headers:{
+          'Authorization': `Bearer ${pat}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+        body: JSON.stringify({ ref: TG.branch, inputs: { scenario: 'auto', force: '1' } }),
+      });
+    if (res.status === 204){
+      tgStatus.className = 'modal-status ok';
+      tgStatus.textContent = '✅ Workflow triggered — the bot will post in the group in ~1–2 min.';
+    } else {
+      let detail = '';
+      try { detail = (await res.json())?.message || ''; } catch {}
+      tgStatus.className = 'modal-status err';
+      tgStatus.textContent = res.status === 401 || res.status === 403
+        ? `Token rejected (${res.status}) — needs the "workflow" / Actions:write scope.`
+        : res.status === 404
+        ? 'Not found (404) — token can\'t see the repo/workflow, or the branch name is wrong.'
+        : `Couldn't trigger (${res.status})${detail ? ` — ${detail}` : ''}.`;
+    }
+  } catch (err){
+    tgStatus.className = 'modal-status err';
+    tgStatus.textContent = `Network error — ${err.message}`;
+  } finally {
+    tgRun.disabled = false;
+  }
+};
 </script>
 </body>
 </html>
