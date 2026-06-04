@@ -8,7 +8,7 @@
     "test": "node --test",
     "start": "node analyst.js",
     "telegram:test": "node --env-file=.env -e \"import('./src/telegram.js').then(({sendTelegram,getTelegramConfig})=>sendTelegram('Setup works!',getTelegramConfig()).then(()=>console.log('sent')).catch(e=>{console.error(e.message);process.exit(1)}))\"",
-    "serve": "node --watch-path=. -e \"import('node:http').then(({default:h})=>import('node:fs').then(({default:f})=>h.createServer((q,s)=>{const p=q.url==='/'?'/index.html':q.url;f.readFile('.'+p,(e,d)=>e?(s.statusCode=404,s.end()):s.end(d))}).listen(8080,()=>console.log('http://localhost:8080'))))\""
+    "serve": "node serve.mjs"
   },
   "dependencies": {
     "@google/genai": "1.7.0"
