@@ -7,8 +7,8 @@ const report = {
   date: '2026-06-03',
   headline: 'Three steady, one worth a check-in.',
   members: [
-    { name: 'Alex', status: 'all_clear', summary: 'Within range.', changed_signals: [], suggestion: '' },
-    { name: 'Sam', status: 'worth_noting', summary: 'RHR up, HRV/sleep down.',
+    { name: 'Mom', status: 'all_clear', summary: 'Within range.', changed_signals: [], suggestion: '' },
+    { name: 'Dad', status: 'worth_noting', summary: 'RHR up, HRV/sleep down.',
       changed_signals: [
         { metric: 'rhr', z: 2.4, phrase: 'resting heart rate noticeably higher than usual' },
         { metric: 'hrv', z: -1.9, phrase: 'HRV lower than usual' },
@@ -22,8 +22,8 @@ test('formatReport leads with the synthetic-data disclosure and the value headli
   const lines = text.split('\n');
   assert.ok(/simulated|synthetic/i.test(lines[0]), 'first line must disclose synthetic data');
   assert.ok(text.includes('Three steady'));
-  assert.ok(text.includes('Sam'));
-  assert.ok(text.includes('Alex'));
+  assert.ok(text.includes('Dad'));
+  assert.ok(text.includes('Mom'));
 });
 
 test('formatReport renders changed_signals in plain language, not raw sigma', () => {

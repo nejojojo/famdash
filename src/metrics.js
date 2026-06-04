@@ -11,9 +11,9 @@ export const METRIC_META = {
 
 // Distinct, realistic per-person baselines. The generator wobbles around these.
 export const PROFILES = [
-  { id: 'm1', name: 'Alex',  means: { rhr: 58, sleep_eff: 90, steps: 9000,  hrv: 65 } },
-  { id: 'm2', name: 'Sam',   means: { rhr: 62, sleep_eff: 86, steps: 6500,  hrv: 48 } },
-  { id: 'm3', name: 'Priya', means: { rhr: 66, sleep_eff: 88, steps: 11000, hrv: 55 } },
+  { id: 'm1', name: 'Mom',  means: { rhr: 58, sleep_eff: 90, steps: 9000,  hrv: 65 } },
+  { id: 'm2', name: 'Dad',   means: { rhr: 62, sleep_eff: 86, steps: 6500,  hrv: 48 } },
+  { id: 'm3', name: 'Sister', means: { rhr: 66, sleep_eff: 88, steps: 11000, hrv: 55 } },
 ];
 
 // Daily wobble (std) per metric — small, so anomalies stand out.

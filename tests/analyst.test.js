@@ -47,14 +47,14 @@ test('runAnalyst passes the schema and returns the model JSON', async () => {
 });
 
 // --- validateReport: catches malformed real LLM output before write/send ---
-const MEMBERS3 = [{ name: 'Alex' }, { name: 'Sam' }, { name: 'Priya' }];
+const MEMBERS3 = [{ name: 'Mom' }, { name: 'Dad' }, { name: 'Sister' }];
 const goodReport = () => ({
   date: '2026-06-03',
   headline: 'Three steady.',
   members: [
-    { name: 'Alex', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
-    { name: 'Sam', status: 'worth_noting', summary: 'rhr up', changed_signals: [{ metric: 'rhr', z: 2.4, phrase: 'resting heart rate noticeably higher than usual' }], suggestion: 'Take it easy.' },
-    { name: 'Priya', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
+    { name: 'Mom', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
+    { name: 'Dad', status: 'worth_noting', summary: 'rhr up', changed_signals: [{ metric: 'rhr', z: 2.4, phrase: 'resting heart rate noticeably higher than usual' }], suggestion: 'Take it easy.' },
+    { name: 'Sister', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
   ],
 });
 

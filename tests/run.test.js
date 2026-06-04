@@ -14,13 +14,13 @@ function deps(overrides = {}) {
       _prompt: null,
       async generateJson(prompt) {
         this._prompt = prompt;
-        // echo a valid 3-member report; names filled by run() are Alex/Sam/Priya
+        // echo a valid 3-member report; names filled by run() are Mom/Dad/Sister
         return {
           date: '2026-06-03', headline: 'h',
           members: [
-            { name: 'Alex', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
-            { name: 'Sam', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
-            { name: 'Priya', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
+            { name: 'Mom', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
+            { name: 'Dad', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
+            { name: 'Sister', status: 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' },
           ],
         };
       },
@@ -139,7 +139,7 @@ test('telemetry is persisted', async () => {
 });
 
 // --- scenario-family-aware eval (offline, canned reports per family) ---
-const MEMBERS3 = [{ id: 'm1', name: 'Alex' }, { id: 'm2', name: 'Sam' }, { id: 'm3', name: 'Priya' }];
+const MEMBERS3 = [{ id: 'm1', name: 'Mom' }, { id: 'm2', name: 'Dad' }, { id: 'm3', name: 'Sister' }];
 const rep = (statuses) => ({
   date: 'd', headline: 'h',
   members: MEMBERS3.map((m, i) => ({ name: m.name, status: statuses[i], summary: '', changed_signals: [], suggestion: '' })),
@@ -153,14 +153,14 @@ test('scenarioFamily classifies labels', () => {
 
 test('eval: perturbation target worth_noting => detected', () => {
   const e = evalReport(rep(['all_clear', 'worth_noting', 'all_clear']),
-    { scenario_family: 'perturbation', target_member: 'Sam' });
+    { scenario_family: 'perturbation', target_member: 'Dad' });
   assert.equal(e.detected, true);
   assert.deepEqual(e.false_positives, []);
 });
 
 test('eval: stale_data target no_data => detected=TRUE (not a miss)', () => {
   const e = evalReport(rep(['all_clear', 'no_data', 'all_clear']),
-    { scenario_family: 'stale_data', target_member: 'Sam' });
+    { scenario_family: 'stale_data', target_member: 'Dad' });
   assert.equal(e.detected, true, 'a correct no_data on a stale target must score as detected');
   assert.deepEqual(e.false_positives, [], 'a no_data is not a false positive');
 });
@@ -169,12 +169,12 @@ test('eval: all_normal with any worth_noting => false positive, detected=null', 
   const e = evalReport(rep(['all_clear', 'worth_noting', 'all_clear']),
     { scenario_family: 'all_normal', target_member: null });
   assert.equal(e.detected, null);
-  assert.deepEqual(e.false_positives, ['Sam']);
+  assert.deepEqual(e.false_positives, ['Dad']);
 });
 
 test('eval: non-target worth_noting is a false positive', () => {
   const e = evalReport(rep(['worth_noting', 'worth_noting', 'all_clear']),
-    { scenario_family: 'perturbation', target_member: 'Sam' });
+    { scenario_family: 'perturbation', target_member: 'Dad' });
   assert.equal(e.detected, true);
-  assert.deepEqual(e.false_positives, ['Alex']);
+  assert.deepEqual(e.false_positives, ['Mom']);
 });

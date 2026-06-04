@@ -6,7 +6,7 @@
   "members": [
     {
       "id": "m1",
-      "name": "Alex",
+      "name": "Mom",
       "history": [
         {
           "date": "2026-05-04",
@@ -229,7 +229,7 @@
     },
     {
       "id": "m2",
-      "name": "Sam",
+      "name": "Dad",
       "history": [
         {
           "date": "2026-05-04",
@@ -452,7 +452,7 @@
     },
     {
       "id": "m3",
-      "name": "Priya",
+      "name": "Sister",
       "history": [
         {
           "date": "2026-05-04",
@@ -735,14 +735,14 @@
     "headline": "Three steady, one worth a check-in.",
     "members": [
       {
-        "name": "Alex",
+        "name": "Mom",
         "status": "all_clear",
         "summary": "Within their normal range.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
-        "name": "Sam",
+        "name": "Dad",
         "status": "worth_noting",
         "summary": "Resting HR up while HRV and sleep dropped — reads like poor recovery.",
         "changed_signals": [
@@ -765,7 +765,7 @@
         "suggestion": "An easy day; mention to a doctor if it persists."
       },
       {
-        "name": "Priya",
+        "name": "Sister",
         "status": "all_clear",
         "summary": "Within their normal range.",
         "changed_signals": [],
@@ -777,7 +777,7 @@
   "eval": {
     "scenario_applied": true,
     "scenario_family": "perturbation",
-    "target_member": "Sam",
+    "target_member": "Dad",
     "detected": true,
     "false_positives": []
   },
