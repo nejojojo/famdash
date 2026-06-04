@@ -207,9 +207,12 @@ GEMINI_MODEL=gemini-2.5-flash
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 
-# Demo controls
-SCENARIO=all_normal
-SEED=1
+# Cadence control. 'auto' = quiet-by-default gate (~13% of days fire a scenario) — the production
+# default. Set to 'all_normal' | 'stale_data' | 'llm' to force a specific scenario (bypasses the
+# gate). FORCE_SCENARIO=1 forces the gate to fire on an 'auto' day (used by workflow_dispatch).
+# (The daily seed + flagged member are derived from the UTC date — there is no SEED knob.)
+SCENARIO=auto
+FORCE_SCENARIO=
 ```
 
 - [ ] **Step 4: Install deps and verify the test runner works**
@@ -829,7 +832,7 @@ Config from env (model + key swappable), one method `generateJson(prompt, schema
 // tests/llm.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getConfig, makeClient } from '../src/llm.js';
+import { getConfig, makeClient, stripFence } from '../src/llm.js';
 
 test('getConfig reads env with a sensible default model', () => {
   const c = getConfig({ GEMINI_API_KEY: 'k' });
@@ -840,6 +843,13 @@ test('getConfig reads env with a sensible default model', () => {
 
 test('makeClient throws clearly when key is missing', () => {
   assert.throws(() => makeClient({ apiKey: '', model: 'm' }), /GEMINI_API_KEY/);
+});
+
+test('stripFence removes a ```json code fence some models add', () => {
+  assert.equal(stripFence('```json\n{"a":1}\n```'), '{"a":1}');
+  assert.equal(stripFence('```\n{"a":1}\n```'), '{"a":1}');
+  assert.equal(stripFence('{"a":1}'), '{"a":1}');         // bare JSON untouched
+  assert.equal(stripFence('  {"a":1}  '), '{"a":1}');     // trims whitespace
 });
 ```
 
@@ -861,6 +871,14 @@ export function getConfig(env = process.env) {
   };
 }
 
+// Strip a leading/trailing ```json … ``` fence some models add despite responseMimeType:'application/json'.
+// Pure + exported so the parse-defensive path is unit-testable without a network call.
+export function stripFence(text) {
+  const t = (text ?? '').trim();
+  const m = t.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return m ? m[1].trim() : t;
+}
+
 // Returns { model, generateJson(prompt, schema?) -> parsed JSON object }.
 export function makeClient(config = getConfig()) {
   if (!config.apiKey) throw new Error('GEMINI_API_KEY is not set');
@@ -868,7 +886,7 @@ export function makeClient(config = getConfig()) {
   return {
     model: config.model,
     async generateJson(prompt, schema) {
-      const res = await ai.models.generateContent({
+      const call = () => ai.models.generateContent({
         model: config.model,
         contents: prompt,
         config: {
@@ -876,11 +894,18 @@ export function makeClient(config = getConfig()) {
           ...(schema ? { responseSchema: schema } : {}),
         },
       });
-      const text = res.text ?? '';
+      // Parse defensively: strip a stray code fence, and retry ONCE if the first
+      // response isn't valid JSON (flash models occasionally fence or truncate).
+      let text = stripFence((await call()).text);
       try {
         return JSON.parse(text);
       } catch {
-        throw new Error(`Gemini returned non-JSON: ${text.slice(0, 200)}`);
+        text = stripFence((await call()).text);
+        try {
+          return JSON.parse(text);
+        } catch {
+          throw new Error(`Gemini returned non-JSON after retry: ${text.slice(0, 200)}`);
+        }
       }
     },
   };
@@ -890,7 +915,7 @@ export function makeClient(config = getConfig()) {
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `node --test tests/llm.test.js`
-Expected: PASS (2 tests).
+Expected: PASS (3 tests).
 
 - [ ] **Step 5: Commit**
 
@@ -935,7 +960,7 @@ test('generateScenarioPool keeps valid, drops invalid/emergency scenarios', asyn
 test('pickScenario is deterministic given an index', () => {
   const pool = [{ label: 'a' }, { label: 'b' }, { label: 'c' }];
   assert.equal(pickScenario(pool, 1).label, 'b');
-  assert.equal(pickScenario(pool, 5).label, 'a'); // wraps
+  assert.equal(pickScenario(pool, 3).label, 'a'); // wraps (3 % 3 = 0)
 });
 ```
 
