@@ -11,7 +11,13 @@
   body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui, sans-serif; }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
   h1 { font-size: 22px; margin: 0 0 4px; }
-  .sim { color: var(--amber); font-size: 13px; margin-bottom: 16px; font-weight:600; }
+  .sim { color: var(--amber); font-size: 13px; margin-bottom: 12px; font-weight:600; }
+  .controls { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .controls label { color:var(--muted); font-size:13px; }
+  select { background:var(--card); color:var(--ink); border:1px solid #2a2e37; border-radius:8px; padding:6px 10px; font:inherit; }
+  .controls .nav { background:var(--card); color:var(--ink); border:1px solid #2a2e37; border-radius:8px; padding:6px 10px; cursor:pointer; }
+  .controls .nav:disabled { opacity:.4; cursor:default; }
+  .hint { color:var(--grey); font-size:12px; }
   .legend { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
   .report { background: var(--card); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; }
   .report h2 { margin: 0 0 10px; font-size: 18px; }
@@ -40,6 +46,13 @@
 <div class="wrap">
   <h1>Family Health Analyst</h1>
   <div class="sim" id="sim"></div>
+  <div class="controls" id="controls" style="display:none">
+    <button class="nav" id="prev" title="Previous day">‹ Prev</button>
+    <label for="daysel">Day:</label>
+    <select id="daysel"></select>
+    <button class="nav" id="next" title="Next day">Next ›</button>
+    <span class="hint" id="dayhint"></span>
+  </div>
   <div class="legend" id="legend"></div>
   <div class="report" id="report">Loading…</div>
   <div class="cards" id="cards"></div>
@@ -53,64 +66,55 @@ const META = {
   steps:{label:'Steps',unit:'',better:'higher'},
   hrv:{label:'HRV',unit:'ms',better:'higher'},
 };
-// Single status vocabulary, shared with the analyst's per-member status. No third "red" tier.
 const STATUS_LABEL = { all_clear:'all clear', worth_noting:'worth a check-in', no_data:'no data today' };
 const STATUS_ORDER = { worth_noting:0, no_data:1, all_clear:2 };
 
 function z(v, b){ if(v==null||!b||b.mean==null) return null; if(!b.std) return 0; return (v-b.mean)/b.std; }
-// Two tiers only (within / outside the person's normal range), paired with a NON-COLOR glyph + word.
 function tier(zv){ return (zv!=null && Math.abs(zv) >= 1.5) ? 'out' : 'in'; }
 function tierColor(t){ return t==='out' ? '#e3a92b' : '#3fb950'; }
-function tierGlyph(t){ return t==='out' ? '▲' : '○'; }   // shape cue, not colour alone
+function tierGlyph(t){ return t==='out' ? '▲' : '○'; }
 function tierWord(t){ return t==='out' ? 'watch' : 'normal'; }
-
-// How many days since this member last synced (today + trailing null history days).
 function daysSinceSync(mem){
   if (mem.today) return 0;
   let n = 1;
-  for (let i = mem.history.length - 1; i >= 0; i--){
-    if (mem.history[i] && mem.history[i].rhr == null) n++; else break;
-  }
+  for (let i = mem.history.length - 1; i >= 0; i--){ if (mem.history[i] && mem.history[i].rhr == null) n++; else break; }
   return n;
 }
+const operator = new URLSearchParams(location.search).get('operator') === '1';
+let charts = [];   // track live Chart instances so we can destroy them on re-render
 
 function showError(msg){
-  document.getElementById('sim').textContent = '';
   document.getElementById('legend').textContent = '';
-  document.getElementById('report').className = 'error';
-  document.getElementById('report').innerHTML =
-    `<h2>Couldn't load today's report</h2>
-     <p class="signals">The daily update may not have run yet, or the data is temporarily unavailable.
-     <br>Details: ${msg}. Please check back after the morning run.</p>`;
+  document.getElementById('cards').innerHTML = '';
+  const el = document.getElementById('report');
+  el.className = 'error';
+  el.innerHTML = `<h2>Couldn't load this day</h2>
+     <p class="signals">The data may not be available yet. Details: ${msg}.</p>`;
 }
 
-async function main(){
-  let data;
-  try {
-    const res = await fetch('data.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`could not fetch data.json (HTTP ${res.status})`);
-    data = await res.json();
-  } catch (e) {
-    showError(e.message);            // covers day-zero (no data.json yet) and network/parse errors
-    return;
-  }
-  render(data);
+async function loadJSON(url){
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
 }
 
+// Render one full day's store (report + cards + 30-day charts). Re-runnable.
 function render(data){
-  const params = new URLSearchParams(location.search);
-  const operator = params.get('operator') === '1';
+  // tear down previous charts and content so switching days is clean
+  charts.forEach(c => { try { c.destroy(); } catch {} });
+  charts = [];
+  document.getElementById('cards').innerHTML = '';
+  const reportEl = document.getElementById('report');
+  reportEl.className = 'report';
 
   document.getElementById('sim').textContent =
     data.simulated ? '⚠︎ Synthetic demo data — not real health measurements; no action needed.' : '';
   document.getElementById('legend').textContent =
-    'Each dot reflects how today compares to that person’s own normal range: ○ normal, ▲ worth a look.';
+    'Each dot reflects how that day compares to the person’s own normal range: ○ normal, ▲ worth a look.';
 
-  // Report block (handles report_valid:false / missing report).
-  const reportEl = document.getElementById('report');
   if (!data.report || data.report_valid === false){
-    reportEl.innerHTML = `<h2>Today’s summary is unavailable</h2>
-      <p class="signals">The analyst report could not be generated this run. The trends below are still current.</p>`;
+    reportEl.innerHTML = `<h2>Summary unavailable for this day</h2>
+      <p class="signals">The analyst report couldn't be generated for this run. The trends below are still shown.</p>`;
   } else {
     const rep = data.report;
     reportEl.innerHTML = `
@@ -125,7 +129,6 @@ function render(data){
       }).join('')}`;
   }
 
-  // Member cards — flagged members first.
   const statusByName = Object.fromEntries((data.report?.members||[]).map(m=>[m.name, m.status]));
   const membersSorted = [...data.members].sort(
     (a,b)=> (STATUS_ORDER[statusByName[a.name]] ?? 3) - (STATUS_ORDER[statusByName[b.name]] ?? 3));
@@ -145,7 +148,7 @@ function render(data){
       const sigma = zv==null ? '' : `(${zv>=0?'+':''}${zv.toFixed(1)}σ)`;
       return `<div class="metric-row">
         <span><span class="dot" style="background:${zv==null?'#8b93a1':tierColor(t)}" aria-hidden="true"></span>${META[metric].label}</span>
-        <span>${shown} ${META[metric].unit} ${sigma}<span class="tier" title="${zv==null?'no data':tierWord(t)}">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span></span>
+        <span>${shown} ${META[metric].unit} ${sigma}<span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span></span>
       </div>`;
     }).join('');
     const sub = mem.today ? '' : `<p class="sub">last synced ${gap} day${gap===1?'':'s'} ago</p>`;
@@ -153,32 +156,71 @@ function render(data){
       ${rows}<div class="chart-grid">${METRICS.map(m=>`<canvas id="c-${mem.id}-${m}" height="120" aria-label="${mem.name} ${META[m].label} 30-day trend"></canvas>`).join('')}</div>`;
     cards.appendChild(card);
 
-    if (typeof Chart === 'undefined') continue; // CDN unavailable → keep value rows, skip charts
+    if (typeof Chart === 'undefined') continue;
     for (const metric of METRICS){
       const series = [...mem.history, ...(mem.today?[mem.today]:[])];
       const labels = series.map(d=>d.date.slice(5));
       const values = series.map(d=>d[metric]);
       const b = base[metric];
       const band = (k)=> labels.map(()=> b.mean==null?null : b.mean + k*b.std);
-      new Chart(document.getElementById(`c-${mem.id}-${metric}`), {
+      charts.push(new Chart(document.getElementById(`c-${mem.id}-${metric}`), {
         type:'line',
         data:{ labels, datasets:[
           { label:'+1σ', data:band(1), borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(88,166,255,0.10)' },
           { label:'-1σ', data:band(-1), borderWidth:0, pointRadius:0, fill:false },
           { label:META[metric].label, data:values, borderColor:'#58a6ff', borderWidth:2, pointRadius:1, tension:0.25, spanGaps:false },
         ]},
-        options:{ plugins:{legend:{display:false}, title:{display:true,text:META[metric].label,color:'#aeb6c2'}},
+        options:{ animation:false, plugins:{legend:{display:false}, title:{display:true,text:META[metric].label,color:'#aeb6c2'}},
           scales:{ x:{ticks:{color:'#8b93a1',maxTicksLimit:6}}, y:{ticks:{color:'#8b93a1'}} } }
-      });
+      }));
     }
   }
 
-  // Footer: the operator-only answer key is gated behind ?operator=1; the casual family view never sees it.
   const when = `As of ${data.generated_at}`;
   document.getElementById('footer').textContent = operator
     ? `${when} · scenario (operator): ${data.scenario}${data.scenario_member?` → ${data.scenario_member}`:''}`
-    + (data.eval ? ` · detected=${data.eval.detected} · false_positives=${JSON.stringify(data.eval.false_positives)}` : '')
+      + (data.eval ? ` · detected=${data.eval.detected} · false_positives=${JSON.stringify(data.eval.false_positives)}` : '')
     : when;
+}
+
+// --- history navigation ---
+let dates = [];          // newest-first list of available day-dates
+const sel = document.getElementById('daysel');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+async function showDate(date){
+  try {
+    const data = date ? await loadJSON(`history/${date}.json`) : await loadJSON('data.json');
+    render(data);
+  } catch (e) {
+    // fall back to today's data.json if a specific day file is missing
+    try { render(await loadJSON('data.json')); } catch (e2) { showError(e2.message); }
+  }
+  const i = dates.indexOf(date);
+  prevBtn.disabled = !(i >= 0 && i < dates.length - 1);   // older
+  nextBtn.disabled = !(i > 0);                            // newer
+  document.getElementById('dayhint').textContent =
+    (date && date === dates[0]) ? '(latest)' : (date ? `(${dates.length}-day history)` : '');
+}
+
+async function main(){
+  try {
+    dates = await loadJSON('history/index.json');         // newest-first
+  } catch { dates = []; }
+
+  if (Array.isArray(dates) && dates.length){
+    document.getElementById('controls').style.display = 'flex';
+    sel.innerHTML = dates.map(d=>`<option value="${d}">${d}</option>`).join('');
+    sel.value = dates[0];
+    sel.onchange = () => showDate(sel.value);
+    prevBtn.onclick = () => { const i = dates.indexOf(sel.value); if (i < dates.length-1){ sel.value = dates[i+1]; showDate(sel.value); } };
+    nextBtn.onclick = () => { const i = dates.indexOf(sel.value); if (i > 0){ sel.value = dates[i-1]; showDate(sel.value); } };
+    await showDate(dates[0]);
+  } else {
+    // no history yet — just show today's data.json
+    await showDate(null);
+  }
 }
 
 main();

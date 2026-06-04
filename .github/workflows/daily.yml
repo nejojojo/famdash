@@ -48,10 +48,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Rebase on the latest tip so a concurrent commit doesn't cause a non-fast-forward push.
           git pull --rebase --autostash origin "${{ github.ref_name }}" || true
-          if git diff --quiet -- data.json; then
-            echo "no data.json changes — nothing to commit"
+          git add -A data.json history          # stages today's store, the new day file, the index, and any pruned files
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
           else
-            git add data.json
             git commit -m "data: daily report $(date -u +%Y-%m-%d)"
             git push
           fi

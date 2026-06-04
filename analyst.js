@@ -5,9 +5,11 @@ import { applyPerturbations, applyStaleData, validateScenario } from './src/scen
 import { generateScenarioPool, pickScenario } from './src/scenarioGenerator.js';
 import { runAnalyst, validateReport } from './src/analyst.js';
 import { formatReport, sendTelegram, getTelegramConfig } from './src/telegram.js';
-import { writeStore } from './src/store.js';
+import { writeStore, readStore } from './src/store.js';
 import { makeClient, getConfig } from './src/llm.js';
+import { updateHistoryIndex } from './src/history.js';
 import { pathToFileURL } from 'node:url';
+import { mkdir, rm } from 'node:fs/promises';
 
 // Deterministic FNV-1a hash of the UTC calendar date (YYYY-MM-DD) — same date ⇒ same value,
 // independent of time-of-day. Drives both the cadence gate and the daily seed/target rotation.
@@ -174,4 +176,15 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     sendMessage: (text) => sendTelegram(text, tgConfig),
   });
   console.log(`Wrote data.json — scenario "${data.scenario}", gate_fired=${data.telemetry.gate_fired}, headline: ${data.report?.headline ?? '(unavailable)'}`);
+
+  // Archive the full daily store so the dashboard can browse history (rolling 30 days).
+  const date = data.report?.date || data.generated_at.slice(0, 10);
+  await mkdir('history', { recursive: true });
+  await writeStore(`history/${date}.json`, data);
+  let existingIndex = [];
+  try { existingIndex = await readStore('history/index.json'); } catch { /* first run — no index yet */ }
+  const { index, pruned } = updateHistoryIndex(existingIndex, date, 30);
+  await writeStore('history/index.json', index);
+  for (const d of pruned) { try { await rm(`history/${d}.json`); } catch { /* already gone */ } }
+  console.log(`Archived history/${date}.json (${index.length} days in history)`);
 }
