@@ -35,22 +35,39 @@ export function formatReport(report) {
 export async function sendTelegram(text, config = getTelegramConfig(), fetchImpl = fetch) {
   if (!config.token || !config.chatId) throw new Error('Telegram config missing (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)');
   const url = `https://api.telegram.org/bot${config.token}/sendMessage`;
-  // Plain text only (no parse_mode): a reliable message beats a bold one.
-  const post = () => fetchImpl(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: config.chatId, text, disable_web_page_preview: true }),
-  });
 
-  let res = await post();
-  if (!res.ok) {
-    // Defense-in-depth: retry once as plain text before giving up.
-    res = await post();
+  // TELEGRAM_CHAT_ID may be a single id or a comma-separated list (e.g. your
+  // personal chat AND the family group) — deliver to every chat in the list.
+  const chatIds = String(config.chatId).split(',').map((s) => s.trim()).filter(Boolean);
+
+  // Plain text only (no parse_mode): a reliable message beats a bold one.
+  const sendOne = async (chatId) => {
+    const post = () => fetchImpl(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+    });
+    let res = await post();
     if (!res.ok) {
-      let description = '';
-      try { description = (await res.json())?.description || ''; } catch { /* ignore */ }
-      throw new Error(`Telegram sendMessage failed: ${res.status}${description ? ` — ${description}` : ''}`);
+      // Defense-in-depth: retry once as plain text before giving up.
+      res = await post();
+      if (!res.ok) {
+        let description = '';
+        try { description = (await res.json())?.description || ''; } catch { /* ignore */ }
+        throw new Error(`Telegram sendMessage to ${chatId} failed: ${res.status}${description ? ` — ${description}` : ''}`);
+      }
     }
+    return res.json();
+  };
+
+  // Attempt every chat; one bad id must not stop delivery to the others. Surface
+  // the first failure after all sends are attempted.
+  const results = [];
+  let firstError = null;
+  for (const chatId of chatIds) {
+    try { results.push(await sendOne(chatId)); }
+    catch (e) { if (!firstError) firstError = e; }
   }
-  return res.json();
+  if (firstError) throw firstError;
+  return results.length === 1 ? results[0] : results;
 }

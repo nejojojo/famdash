@@ -83,3 +83,29 @@ test('getTelegramConfig reads env', () => {
   const c = getTelegramConfig({ TELEGRAM_BOT_TOKEN: 't', TELEGRAM_CHAT_ID: 'c' });
   assert.deepEqual(c, { token: 't', chatId: 'c' });
 });
+
+test('sendTelegram delivers to every chat id in a comma-separated list', async () => {
+  const seen = [];
+  const fakeFetch = async (url, opts) => {
+    seen.push(JSON.parse(opts.body).chat_id);
+    return { ok: true, json: async () => ({ ok: true }) };
+  };
+  await sendTelegram('hi', { token: 'TOK', chatId: '111, -1002222222222 ,333' }, fakeFetch);
+  assert.deepEqual(seen, ['111', '-1002222222222', '333'], 'sends once per trimmed id');
+});
+
+test('sendTelegram delivers to good chats even if one id fails, then throws', async () => {
+  const seen = [];
+  const fakeFetch = async (url, opts) => {
+    const id = JSON.parse(opts.body).chat_id;
+    seen.push(id);
+    if (id === 'bad') return { ok: false, status: 400, json: async () => ({ description: 'chat not found' }) };
+    return { ok: true, json: async () => ({ ok: true }) };
+  };
+  await assert.rejects(
+    () => sendTelegram('hi', { token: 'TOK', chatId: 'good1,bad,good2' }, fakeFetch),
+    (e) => /bad/.test(e.message) && /chat not found/.test(e.message),
+  );
+  // good1 once; bad twice (initial + retry); good2 once — delivery to good chats not blocked
+  assert.deepEqual(seen, ['good1', 'bad', 'bad', 'good2']);
+});
