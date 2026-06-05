@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T00:14:46.610Z",
+  "generated_at": "2026-06-05T07:49:06.939Z",
   "simulated": true,
   "scenario": "all_normal",
   "scenario_member": null,
@@ -7,6 +7,7 @@
     {
       "id": "m1",
       "name": "Mom",
+      "real": false,
       "history": [
         {
           "date": "2026-05-06",
@@ -230,6 +231,7 @@
     {
       "id": "m2",
       "name": "Dad",
+      "real": false,
       "history": [
         {
           "date": "2026-05-06",
@@ -453,6 +455,7 @@
     {
       "id": "m3",
       "name": "Sister",
+      "real": false,
       "history": [
         {
           "date": "2026-05-06",
@@ -672,6 +675,231 @@
         "hrv": 53.8,
         "steps": 9267
       }
+    },
+    {
+      "id": "me",
+      "name": "Me",
+      "real": true,
+      "history": [
+        {
+          "date": "2026-05-06",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-07",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-08",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-09",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-10",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-11",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-12",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-13",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-14",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-15",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-16",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-17",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-18",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-19",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-20",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-21",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-22",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-23",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-24",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-25",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-26",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-27",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-28",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-29",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-05-30",
+          "rhr": 61,
+          "hrv": 55,
+          "sleep_eff": 86,
+          "steps": 5471
+        },
+        {
+          "date": "2026-05-31",
+          "rhr": 58,
+          "hrv": 64,
+          "sleep_eff": 92,
+          "steps": 11003
+        },
+        {
+          "date": "2026-06-01",
+          "rhr": 60,
+          "hrv": 58,
+          "sleep_eff": 85,
+          "steps": 6188
+        },
+        {
+          "date": "2026-06-02",
+          "rhr": 57,
+          "hrv": 67,
+          "sleep_eff": 90,
+          "steps": 10422
+        },
+        {
+          "date": "2026-06-03",
+          "rhr": 59,
+          "hrv": 61,
+          "sleep_eff": 88,
+          "steps": 7210
+        },
+        {
+          "date": "2026-06-04",
+          "rhr": 58,
+          "hrv": 65,
+          "sleep_eff": 91,
+          "steps": 9034
+        }
+      ],
+      "today": {
+        "date": "2026-06-05",
+        "rhr": 58,
+        "hrv": 63,
+        "sleep_eff": 90,
+        "steps": 8800
+      },
+      "feed_state": "ok"
     }
   ],
   "baselines": {
@@ -728,30 +956,55 @@
         "mean": 53.54,
         "std": 6.057802036815117
       }
+    },
+    "me": {
+      "rhr": {
+        "mean": 58.833333333333336,
+        "std": 1.4719601443879744
+      },
+      "sleep_eff": {
+        "mean": 88.66666666666667,
+        "std": 2.804757862395017
+      },
+      "steps": {
+        "mean": 8221.333333333334,
+        "std": 2278.710307754513
+      },
+      "hrv": {
+        "mean": 61.666666666666664,
+        "std": 4.546060565661952
+      }
     }
   },
   "report": {
     "date": "2026-06-05",
-    "headline": "Everyone is tracking within their typical ranges today, indicating a good day for the family's health metrics.",
+    "headline": "Family Health Report: All members show metrics within typical ranges for today.",
     "members": [
       {
         "name": "Mom",
         "status": "all_clear",
-        "summary": "Mom's resting heart rate, sleep efficiency, steps, and HRV are all within her usual healthy ranges today.",
+        "summary": "Mom's metrics for today are all within her typical range, indicating a good day of recovery.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Dad",
         "status": "all_clear",
-        "summary": "Dad's health metrics, including resting heart rate, sleep efficiency, steps, and HRV, are all within his normal baseline today.",
+        "summary": "Dad's health metrics are within his normal baseline today, suggesting a typical day.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Sister",
         "status": "all_clear",
-        "summary": "Sister's resting heart rate, sleep efficiency, steps, and HRV are all consistent with her personal baselines today.",
+        "summary": "Sister's data for today shows her metrics are consistent with her personal baseline.",
+        "changed_signals": [],
+        "suggestion": ""
+      },
+      {
+        "name": "Me",
+        "status": "all_clear",
+        "summary": "All of my recorded metrics are within my typical range today.",
         "changed_signals": [],
         "suggestion": ""
       }
@@ -769,7 +1022,7 @@
     "gate_fired": false,
     "scenario_pool_size": 0,
     "scenario_pool_valid": 0,
-    "llm_ms": 6450,
+    "llm_ms": 15699,
     "model": "gemini-2.5-flash",
     "telegram_ok": true
   }
