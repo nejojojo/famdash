@@ -71,6 +71,23 @@ export function normalizeFeed(rows, { today, days }) {
   return { history, today: todayEntry, presentDays };
 }
 
+// Merge a single day's row into a stored feed history. Pure.
+// Upserts by date (the new row wins for its date), drops malformed/future-dated entries,
+// sorts ascending by date, and keeps the most recent `keepDays`. Tolerates a corrupt
+// (non-array) history by starting fresh. This is what lets the iOS Shortcut push only
+// today's one row — Node accumulates the window here, where JSON can't get mangled.
+export function mergeFeedRow(history, row, { today, keepDays = 35 }) {
+  const todayStr = isoDay(today, 0);
+  const byDate = new Map();
+  for (const r of Array.isArray(history) ? history : []) {
+    if (r && typeof r.date === 'string' && r.date <= todayStr) byDate.set(r.date, r);
+  }
+  if (row && typeof row.date === 'string' && row.date <= todayStr) byDate.set(row.date, row);
+  return [...byDate.values()]
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+    .slice(-keepDays);
+}
+
 // Build one member's data from its source. Returns { id, name, real, history, today, feed_state? }.
 export async function loadMemberData(member, { today, days, seed, readFeed }) {
   if (member.source === 'synthetic') {

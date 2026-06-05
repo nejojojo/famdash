@@ -1,9 +1,1 @@
-[{"date":"2026-06-04","rhr":58,"sleep_eff":91,"steps":903
-  4,"hrv":65},{"date":"2026-06-03","rhr":59,"sleep_eff":88,
-  "steps":7210,"hrv":61},{"date":"2026-06-02","rhr":57,"sle
-  ep_eff":90,"steps":10422,"hrv":67},{"date":"2026-06-01","
-  rhr":60,"sleep_eff":85,"steps":6188,"hrv":58},{"date":"20
-  26-05-31","rhr":58,"sleep_eff":92,"steps":11003,"hrv":64}
-  ,{"date":"2026-05-30","rhr":61,"sleep_eff":86,"steps":547
-  1,"hrv":55},{"date":"2026-05-29","rhr":57,"sleep_eff":89,
-  "steps":8740,"hrv":66}]
+[{"date":"2026-05-30","rhr":61,"sleep_eff":86,"steps":5471,"hrv":55},{"date":"2026-05-31","rhr":58,"sleep_eff":92,"steps":11003,"hrv":64},{"date":"2026-06-01","rhr":60,"sleep_eff":85,"steps":6188,"hrv":58},{"date":"2026-06-02","rhr":57,"sleep_eff":90,"steps":10422,"hrv":67},{"date":"2026-06-03","rhr":59,"sleep_eff":88,"steps":7210,"hrv":61},{"date":"2026-06-04","rhr":58,"sleep_eff":91,"steps":9034,"hrv":65},{"date":"2026-06-05","rhr":58,"sleep_eff":90,"steps":8800,"hrv":63}]

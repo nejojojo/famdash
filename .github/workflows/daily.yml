@@ -32,6 +32,10 @@ jobs:
       # Gate: a regression must never ship a daily report. All tests use fakes — no secrets needed.
       - name: Run tests
         run: node --test
+      # Merge the Shortcut's single-row push (feeds/me-latest.json) into the history
+      # window (feeds/me.json) before the analyst reads it. No-op if nothing was pushed.
+      - name: Ingest feed updates
+        run: node src/ingest.js me
       - name: Run analyst
         run: node analyst.js
         env:
@@ -48,7 +52,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Rebase on the latest tip so a concurrent commit doesn't cause a non-fast-forward push.
           git pull --rebase --autostash origin "${{ github.ref_name }}" || true
-          git add -A data.json history          # stages today's store, the new day file, the index, and any pruned files
+          git add -A data.json history feeds     # stages today's store, day file, pruned files, and the merged feed
           if git diff --cached --quiet; then
             echo "nothing to commit"
           else
