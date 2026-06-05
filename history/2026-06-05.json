@@ -1,5 +1,9 @@
 {
+<<<<<<< Updated upstream
   "generated_at": "2026-06-05T07:49:06.939Z",
+=======
+  "generated_at": "2026-06-05T08:24:49.573Z",
+>>>>>>> Stashed changes
   "simulated": true,
   "scenario": "all_normal",
   "scenario_member": null,
@@ -976,6 +980,7 @@
       }
     }
   },
+<<<<<<< Updated upstream
   "report": {
     "date": "2026-06-05",
     "headline": "Family Health Report: All members show metrics within typical ranges for today.",
@@ -1011,6 +1016,10 @@
     ]
   },
   "report_valid": true,
+=======
+  "report": null,
+  "report_valid": false,
+>>>>>>> Stashed changes
   "eval": {
     "scenario_applied": false,
     "scenario_family": "all_normal",
@@ -1022,7 +1031,11 @@
     "gate_fired": false,
     "scenario_pool_size": 0,
     "scenario_pool_valid": 0,
+<<<<<<< Updated upstream
     "llm_ms": 15699,
+=======
+    "llm_ms": 7630,
+>>>>>>> Stashed changes
     "model": "gemini-2.5-flash",
     "telegram_ok": true
   }
