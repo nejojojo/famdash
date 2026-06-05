@@ -109,3 +109,8 @@ test('sendTelegram delivers to good chats even if one id fails, then throws', as
   // good1 once; bad twice (initial + retry); good2 once — delivery to good chats not blocked
   assert.deepEqual(seen, ['good1', 'bad', 'bad', 'good2']);
 });
+
+test('formatReport omits the synthetic disclosure when simulated:false', () => {
+  const text = formatReport(report, { simulated: false });
+  assert.ok(!/simulated|synthetic/i.test(text.split('\n')[0]), 'no disclosure when all-real');
+});

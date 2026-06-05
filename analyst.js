@@ -1,5 +1,5 @@
 // analyst.js  (repo root — the entrypoint GitHub Actions runs)
-import { generateNormalData } from './src/generator.js';
+import { loadMemberData, readFamilyFile } from './src/sources.js';
 import { computeBaseline } from './src/baseline.js';
 import { applyPerturbations, applyStaleData, validateScenario } from './src/scenarios.js';
 import { generateScenarioPool, pickScenario } from './src/scenarioGenerator.js';
@@ -35,16 +35,17 @@ export function scenarioFamily(label) {
   return 'perturbation';
 }
 
-// Scenario-family-aware scoring of the analyst against the stored answer key. The expected target
-// status differs per family: perturbation ⇒ 'worth_noting', stale_data ⇒ 'no_data', all_normal ⇒
-// no target. A 'no_data' is NEVER a false positive; only a NON-target 'worth_noting' is.
-export function evalReport(report, { scenario_family, target_member }) {
+// Scenario-family-aware scoring. `evaluable` (optional) restricts scoring to that name set
+// (used to exclude real members, which have no ground truth). Omitted ⇒ score all members.
+export function evalReport(report, { scenario_family, target_member, evaluable }) {
   const expected = scenario_family === 'stale_data' ? 'no_data'
                  : scenario_family === 'perturbation' ? 'worth_noting'
                  : null;
-  const byName = new Map(report.members.map((m) => [m.name, m.status]));
+  const names = evaluable ? new Set(evaluable) : null;
+  const consider = report.members.filter((m) => !names || names.has(m.name));
+  const byName = new Map(consider.map((m) => [m.name, m.status]));
   const detected = target_member != null ? byName.get(target_member) === expected : null;
-  const false_positives = report.members
+  const false_positives = consider
     .filter((m) => m.name !== target_member && m.status === 'worth_noting')
     .map((m) => m.name);
   return { detected, false_positives };
@@ -53,111 +54,83 @@ export function evalReport(report, { scenario_family, target_member }) {
 // Pure, fully-injectable pipeline. Returns the store object it wrote.
 export async function run(deps) {
   const {
-    today,
-    env = {},
-    scenario = 'auto',     // 'auto' is gated; 'all_normal'|'stale_data'|'llm' bypass the gate
-    force = false,         // workflow_dispatch can force a scenario on a gated day
-    llmClient,
+    today, env = {}, scenario = 'auto', force = false, llmClient,
+    family = readFamilyFile(),
     scenarioPool = (client) => generateScenarioPool(client),
-    sendMessage,
-    write = writeStore,
-    storePath = 'data.json',
+    readFeed, sendMessage, write = writeStore, storePath = 'data.json',
   } = deps;
 
-  // Daily seed + target rotate with the UTC date so the data differs each day and the flagged
-  // member is not always the same person (was: fixed seed ⇒ always Sam).
   const dateHash = hashDate(today);
   const seed = dateHash % 100000;
 
-  // 1. Everyone normal (clean).
-  const members = generateNormalData({ today, days: 30, baseSeed: seed });
-  const targetIdx = dateHash % members.length;
-
-  // 2. Baselines computed ONCE from CLEAN history, BEFORE any scenario mutates the data, so a
-  //    multi-day anomaly can't fold into the very baseline meant to reveal it. applyPerturbations
-  //    mutates day objects in place (history too, for offset>0) and applyStaleData nulls trailing
-  //    days — both must run AFTER this. Consumed by the analyst AND written for the dashboard.
-  const baselines = Object.fromEntries(members.map((m) => [m.id, computeBaseline(m.history)]));
-
-  // 3. Resolve the EFFECTIVE scenario. 'auto' is gated (quiet by default); explicit values bypass
-  //    the gate so operators and demos still work.
-  let gate_fired = false;
-  let effective = scenario;
-  if (scenario === 'auto') {
-    gate_fired = shouldFireScenario(today, { force });
-    effective = gate_fired ? 'llm' : 'all_normal';
+  // 1. Build every member from config (synthetic → generator; feed → later task).
+  const members = [];
+  for (let i = 0; i < family.members.length; i++) {
+    members.push(await loadMemberData(family.members[i], { today, days: 30, seed: seed + i * 1000, readFeed }));
   }
 
-  // 4. Apply the effective scenario to ONE member. Label is operator-only (never sent to the LLM).
-  let label = 'all_normal';
-  let targetId = null;
-  let scenario_pool_size = 0;
-  let scenario_pool_valid = 0;
-  if (effective === 'stale_data') {
-    applyStaleData(members[targetIdx], 2);
-    label = 'stale_data';
-    targetId = members[targetIdx].id;
-  } else if (effective === 'llm') {
+  // 2. Clean baselines for everyone, BEFORE any scenario mutates data.
+  const baselines = Object.fromEntries(members.map((m) => [m.id, computeBaseline(m.history)]));
+
+  // 3. Resolve effective scenario (gate unchanged).
+  let gate_fired = false;
+  let effective = scenario;
+  if (scenario === 'auto') { gate_fired = shouldFireScenario(today, { force }); effective = gate_fired ? 'llm' : 'all_normal'; }
+
+  // 4. Scenario targets a SYNTHETIC member only.
+  const synthetic = members.filter((m) => !m.real);
+  let label = 'all_normal', targetId = null, scenario_pool_size = 0, scenario_pool_valid = 0;
+  const targetIdx = synthetic.length ? (dateHash % synthetic.length) : -1;
+  const target = targetIdx >= 0 ? synthetic[targetIdx] : null;
+  if (effective === 'stale_data' && target) {
+    applyStaleData(target, 2); label = 'stale_data'; targetId = target.id;
+  } else if (effective === 'llm' && target) {
     const pool = await scenarioPool(llmClient);
     scenario_pool_size = pool.length;
     scenario_pool_valid = pool.filter((s) => validateScenario(s).ok).length;
     const chosen = pickScenario(pool, seed);
-    if (chosen) {
-      applyPerturbations(members[targetIdx], chosen.perturbations);
-      label = chosen.label;
-      targetId = members[targetIdx].id;
-    } else {
-      label = 'all_normal'; // pool empty ⇒ fall back to a quiet day (logged for telemetry)
-      console.warn('scenario pool empty — falling back to all_normal');
-    }
+    if (chosen) { applyPerturbations(target, chosen.perturbations); label = chosen.label; targetId = target.id; }
+    else { label = 'all_normal'; console.warn('scenario pool empty — all_normal'); }
   }
-  const targetName = targetId ? members[targetIdx].name : null;
+  const targetName = targetId ? target.name : null;
 
-  // 5. Analyst sees data + baselines only — never the label. Tolerate a thrown/garbage response.
+  // 5. Analyst sees only members WITH data today; real no-data members are excluded.
+  const prompted = members.filter((m) => m.today != null);
   const t0 = Date.now();
   let report = null;
-  try { report = await runAnalyst(llmClient, members, baselines); }
+  try { report = await runAnalyst(llmClient, prompted, baselines); }
   catch (e) { console.error('analyst failed:', e.message); }
   const llm_ms = Date.now() - t0;
   const model = llmClient?.model || env.GEMINI_MODEL || 'gemini-flash';
 
-  // 6. Validate the (real, untrusted) LLM output. On failure, send a safe plain-text fallback
-  //    rather than shipping a broken report — but still write the store for the dashboard.
-  const report_valid = report ? validateReport(report, members).ok : false;
-  const messageText = report_valid
-    ? formatReport(report)
-    : 'Daily Health Report unavailable today (technical issue) — data is synthetic, no action needed.';
+  // 6. Validate against the PROMPTED member count.
+  const report_valid = report ? validateReport(report, prompted).ok : false;
+  const messageText = report_valid ? formatReport(report, { simulated: members.some((m) => !m.real) }) : 'Daily Health Report unavailable today (technical issue) — data is synthetic, no action needed.';
 
-  // 7. Scenario-family-aware eval against the stored answer key (only meaningful on a valid report).
+  // 7. Eval over SYNTHETIC members only.
   const fam = scenarioFamily(label);
   const scenario_applied = label !== 'all_normal';
+  const evaluable = synthetic.map((m) => m.name);
   let evalResult = { scenario_applied, scenario_family: fam, target_member: targetName, detected: null, false_positives: [] };
   if (report_valid) {
-    const r = evalReport(report, { scenario_family: fam, target_member: targetName });
+    const r = evalReport(report, { scenario_family: fam, target_member: targetName, evaluable });
     evalResult.detected = scenario_applied ? r.detected : null;
     evalResult.false_positives = r.false_positives;
   }
 
-  // 8. Push to Telegram. Record the outcome; never let a send failure lose the store.
+  // 8. Telegram.
   let telegram_ok = false;
-  try { await sendMessage(messageText); telegram_ok = true; }
-  catch (e) { console.error('telegram send failed:', e.message); }
+  try { await sendMessage(messageText); telegram_ok = true; } catch (e) { console.error('telegram send failed:', e.message); }
 
-  // 9. Persist the store (label is top-level, operator-only).
+  // 9. Persist. `simulated` ⇒ "contains any synthetic member".
   const data = {
     generated_at: today.toISOString(),
-    simulated: true,
-    scenario: label,
-    scenario_member: targetId,
-    members,
-    baselines,
-    report,
-    report_valid,
-    eval: evalResult,
+    simulated: members.some((m) => !m.real),
+    scenario: label, scenario_member: targetId,
+    members, baselines, report, report_valid, eval: evalResult,
     telemetry: { gate_fired, scenario_pool_size, scenario_pool_valid, llm_ms, model, telegram_ok },
   };
   await write(storePath, data);
-
   return data;
 }
 

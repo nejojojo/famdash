@@ -306,6 +306,7 @@
   <div class="modal" role="dialog" aria-modal="true" aria-label="Telegram daily report">
     <button class="modal-x" id="tgClose" aria-label="Close" title="Close">×</button>
     <h2 class="modal-title">Telegram daily report</h2>
+    <p class="modal-help">For demo purposes — the daily report is automatically sent every day at 10pm.</p>
 
     <section class="modal-sec">
       <h3>Join the family group</h3>
@@ -383,8 +384,8 @@ function render(data){
 
   document.getElementById('sim').textContent =
     data.simulated ? '⚠︎ Synthetic demo data — not real health measurements; no action needed.' : '';
-  document.getElementById('legend').innerHTML =
-    'Each dot reflects how that day compares to the person’s own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.';
+  document.getElementById(‘legend’).innerHTML =
+    ‘Each dot reflects how that day compares to the person’s own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.  ·  <span style="color:var(--green)">● real</span> = live data, demo = simulated.’;
 
   if (!data.report || data.report_valid === false){
     reportEl.className = 'report report--plain';
@@ -439,12 +440,19 @@ function render(data){
       </div>`;
     }).join('');
     const badge = status ? `<span class="c-badge cb-${status}">${STATUS_LABEL[status]||status}</span>` : '';
-    const sub = mem.today ? '' : `<p class="sub">last synced ${gap} day${gap===1?'':'s'} ago</p>`;
+    const tag = mem.real ? '<span class="tier" style="color:var(--green)">● real</span>' : '<span class="tier">demo</span>';
+    const stateCopy = {
+      ok: '', stale: `last synced ${gap} day${gap === 1 ? '' : 's'} ago`,
+      never_synced: 'not synced yet', error: 'feed unavailable',
+    };
+    const sub = (mem.real && mem.feed_state && mem.feed_state !== 'ok')
+      ? `<p class="sub">${stateCopy[mem.feed_state] || ''}</p>`
+      : (mem.today ? '' : `<p class="sub">last synced ${gap} day${gap===1?'':'s'} ago</p>`);
     const initial = (mem.name||'?').trim().charAt(0).toUpperCase();
     card.innerHTML = `
       <div class="c-head">
         <div class="c-avatar">${initial}</div>
-        <div><h3>${mem.name}</h3>${sub}</div>
+        <div><h3>${mem.name} ${tag}</h3>${sub}</div>
         ${badge}
       </div>
       ${rows}

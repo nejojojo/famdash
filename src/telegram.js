@@ -16,10 +16,12 @@ function signalPhrase(sig) {
 // Plain-text rendering of the report. NO Markdown — sent with no parse_mode, so stray
 // _ * [ ] ` characters in LLM free text are delivered verbatim and never cause an HTTP 400.
 // The synthetic-data disclosure is the FIRST line; the value headline leads the body.
-export function formatReport(report) {
+export function formatReport(report, { simulated = true } = {}) {
   const lines = [];
-  lines.push('Synthetic demo data — not real health measurements; no action needed.');
-  lines.push('');
+  if (simulated) {
+    lines.push('Synthetic demo data — not real health measurements; no action needed.');
+    lines.push('');
+  }
   lines.push(report.headline);
   lines.push(`Daily Health Report — ${report.date}`);
   lines.push('');

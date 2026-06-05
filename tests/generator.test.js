@@ -1,11 +1,13 @@
 // tests/generator.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isoDay, generateMemberSeries, generateNormalData } from '../src/generator.js';
-import { PROFILES, METRICS } from '../src/metrics.js';
+import { isoDay, generateMemberSeries } from '../src/generator.js';
+import { loadMemberData } from '../src/sources.js';
+import { METRICS } from '../src/metrics.js';
 import { computeBaseline, zScore } from '../src/baseline.js';
 
 const TODAY = new Date('2026-06-03T12:00:00Z');
+const PROFILE = { means: { rhr: 58, sleep_eff: 90, steps: 9000, hrv: 65 } };
 
 test('isoDay counts back in whole days', () => {
   assert.equal(isoDay(TODAY, 0), '2026-06-03');
@@ -13,27 +15,32 @@ test('isoDay counts back in whole days', () => {
 });
 
 test('series is deterministic given a seed and has days+1 entries', () => {
-  const a = generateMemberSeries(PROFILES[0], { today: TODAY, days: 30, seed: 5 });
-  const b = generateMemberSeries(PROFILES[0], { today: TODAY, days: 30, seed: 5 });
+  const a = generateMemberSeries(PROFILE, { today: TODAY, days: 30, seed: 5 });
+  const b = generateMemberSeries(PROFILE, { today: TODAY, days: 30, seed: 5 });
   assert.equal(a.length, 31);
   assert.deepEqual(a, b);
 });
 
 test('values sit near the profile mean (realistic, not wild)', () => {
-  const s = generateMemberSeries(PROFILES[0], { today: TODAY, days: 60, seed: 3 });
+  const s = generateMemberSeries(PROFILE, { today: TODAY, days: 60, seed: 3 });
   const hist = s.slice(0, -1);
   const base = computeBaseline(hist);
   for (const m of METRICS) {
-    assert.ok(Math.abs(base[m].mean - PROFILES[0].means[m]) < PROFILES[0].means[m] * 0.1,
-      `${m} mean ${base[m].mean} far from profile ${PROFILES[0].means[m]}`);
+    assert.ok(Math.abs(base[m].mean - PROFILE.means[m]) < PROFILE.means[m] * 0.1,
+      `${m} mean ${base[m].mean} far from profile ${PROFILE.means[m]}`);
   }
 });
 
-test('on a normal day extreme |z|>=3 values stay within the statistical tail', () => {
+test('on a normal day extreme |z|>=3 values stay within the statistical tail', async () => {
   let total = 0, extreme = 0;
+  const ms = [
+    { id: 'm1', name: 'Mom', source: 'synthetic', means: { rhr: 58, sleep_eff: 90, steps: 9000, hrv: 65 } },
+    { id: 'm2', name: 'Dad', source: 'synthetic', means: { rhr: 62, sleep_eff: 86, steps: 6500, hrv: 48 } },
+    { id: 'm3', name: 'Sister', source: 'synthetic', means: { rhr: 66, sleep_eff: 88, steps: 11000, hrv: 55 } },
+  ];
   for (let seed = 1; seed <= 200; seed++) {
-    const members = generateNormalData({ today: TODAY, days: 30, baseSeed: seed });
-    for (const mem of members) {
+    for (let i = 0; i < ms.length; i++) {
+      const mem = await loadMemberData(ms[i], { today: TODAY, days: 30, seed: seed + i * 1000 });
       const base = computeBaseline(mem.history);
       for (const metric of METRICS) {
         const z = zScore(mem.today[metric], base[metric]);
@@ -43,12 +50,11 @@ test('on a normal day extreme |z|>=3 values stay within the statistical tail', (
       }
     }
   }
-  const frac = extreme / total;
-  assert.ok(frac < 0.02, `|z|>=3 fraction ${(frac * 100).toFixed(2)}% exceeds 2% tail (n=${total})`);
+  assert.ok(extreme / total < 0.02, `|z|>=3 fraction ${(extreme / total * 100).toFixed(2)}% exceeds 2%`);
 });
 
 test('sleep deviation couples to NEXT-day rhr (negative) and hrv (positive) with real effect size', () => {
-  const s = generateMemberSeries(PROFILES[0], { today: TODAY, days: 400, seed: 17 });
+  const s = generateMemberSeries(PROFILE, { today: TODAY, days: 400, seed: 17 });
   const base = computeBaseline(s.slice(0, -1));
   const sleepDev = s.map((d) => d.sleep_eff - base.sleep_eff.mean);
   const rhrDev = s.map((d) => d.rhr - base.rhr.mean);
@@ -75,11 +81,3 @@ test('sleep deviation couples to NEXT-day rhr (negative) and hrv (positive) with
   assert.ok(Math.abs(cHrv) >= 0.1, `sleep→hrv coupling ${cHrv.toFixed(3)} too weak (|corr|>=0.1)`);
 });
 
-test('generateNormalData returns 3 members with history + today', () => {
-  const members = generateNormalData({ today: TODAY, days: 30, baseSeed: 1 });
-  assert.equal(members.length, 3);
-  for (const mem of members) {
-    assert.equal(mem.history.length, 30);
-    assert.ok(mem.today && mem.today.date === '2026-06-03');
-  }
-});

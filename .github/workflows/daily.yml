@@ -1,8 +1,8 @@
 name: daily-analyst
 on:
   schedule:
-    # 23:00 UTC = 07:00 MYT (UTC+8). NOTE: GitHub cron is best-effort and can be delayed 5–30+ min.
-    - cron: '0 23 * * *'
+    # 14:00 UTC = 22:00 MYT (UTC+8), i.e. 10pm daily. NOTE: GitHub cron is best-effort and can be delayed 5–30+ min.
+    - cron: '0 14 * * *'
   workflow_dispatch:
     inputs:
       scenario:

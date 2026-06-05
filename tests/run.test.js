@@ -25,6 +25,14 @@ function deps(overrides = {}) {
         };
       },
     },
+    family: {
+      family: 'Test',
+      members: [
+        { id: 'm1', name: 'Mom',    source: 'synthetic', means: { rhr: 58, sleep_eff: 90, steps: 9000,  hrv: 65 } },
+        { id: 'm2', name: 'Dad',    source: 'synthetic', means: { rhr: 62, sleep_eff: 86, steps: 6500,  hrv: 48 } },
+        { id: 'm3', name: 'Sister', source: 'synthetic', means: { rhr: 66, sleep_eff: 88, steps: 11000, hrv: 55 } },
+      ],
+    },
     scenarioPool: async () => ([
       { label: 'poor_recovery', perturbations: [{ offset: 0, deltas: { rhr: 8, hrv: -12, sleep_eff: -9 } }] },
     ]),
@@ -177,4 +185,36 @@ test('eval: non-target worth_noting is a false positive', () => {
     { scenario_family: 'perturbation', target_member: 'Dad' });
   assert.equal(e.detected, true);
   assert.deepEqual(e.false_positives, ['Mom']);
+});
+
+test('eval: evaluable allow-list excludes non-listed members from false positives', () => {
+  const r = rep(['worth_noting', 'worth_noting', 'all_clear']); // Mom, Dad, Sister
+  const e = evalReport(r, { scenario_family: 'perturbation', target_member: 'Dad', evaluable: ['Dad', 'Sister'] });
+  assert.equal(e.detected, true);
+  assert.deepEqual(e.false_positives, []); // Mom is not evaluable → not a false positive
+});
+
+test('mixed family: real member flows through; scenarios/eval stay synthetic-only', async () => {
+  const fullFeed = Array.from({ length: 20 }, (_, i) => ({
+    date: new Date(TODAY.getTime() - i * 86400000).toISOString().slice(0, 10),
+    rhr: 58, sleep_eff: 90, steps: 9000, hrv: 65,
+  }));
+  const d = deps({
+    scenario: 'llm',
+    readFeed: async () => fullFeed,
+    family: { family: 'T', members: [
+      { id: 'm1', name: 'Mom', source: 'synthetic', means: { rhr: 58, sleep_eff: 90, steps: 9000, hrv: 65 } },
+      { id: 'm2', name: 'Dad', source: 'synthetic', means: { rhr: 62, sleep_eff: 86, steps: 6500, hrv: 48 } },
+      { id: 'm3', name: 'Sister', source: 'synthetic', means: { rhr: 66, sleep_eff: 88, steps: 11000, hrv: 55 } },
+      { id: 'me', name: 'Me', source: 'feed' },
+    ] },
+    llmClient: { _prompt: null, async generateJson(p) { this._prompt = p; return { date: '2026-06-03', headline: 'h', members:
+      ['Mom','Dad','Sister','Me'].map((n) => ({ name: n, status: n === 'Me' ? 'worth_noting' : 'all_clear', summary: 'ok', changed_signals: [], suggestion: '' })) }; } },
+  });
+  const data = await run(d);
+  const me = data.members.find((m) => m.id === 'me');
+  assert.equal(me.real, true);
+  assert.equal(me.feed_state, 'ok');
+  assert.notEqual(data.scenario_member, 'me');     // never targets the real member
+  assert.deepEqual(data.eval.false_positives, []); // Me's worth_noting is NOT a false positive (excluded)
 });

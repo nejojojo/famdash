@@ -1,5 +1,5 @@
 // src/generator.js
-import { PROFILES, NOISE, roundMetric } from './metrics.js';
+import { NOISE, roundMetric } from './metrics.js';
 import { makeRng, gaussian } from './random.js';
 
 // ISO (YYYY-MM-DD) for `daysAgo` days before the given `today` Date.
@@ -34,15 +34,3 @@ export function generateMemberSeries(profile, { today, days = 30, seed }) {
   return series;
 }
 
-// All members normal. Returns Member[] with `history` (excl. today) and `today`.
-export function generateNormalData({ today, days = 30, baseSeed = 1 }) {
-  return PROFILES.map((profile, idx) => {
-    const series = generateMemberSeries(profile, { today, days, seed: baseSeed + idx * 1000 });
-    return {
-      id: profile.id,
-      name: profile.name,
-      history: series.slice(0, -1),
-      today: series[series.length - 1],
-    };
-  });
-}

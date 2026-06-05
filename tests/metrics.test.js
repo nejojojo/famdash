@@ -1,7 +1,7 @@
 // tests/metrics.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { METRICS, METRIC_META, PROFILES, NOISE, roundMetric } from '../src/metrics.js';
+import { METRICS, METRIC_META, NOISE, roundMetric } from '../src/metrics.js';
 
 test('four canonical metrics in fixed order', () => {
   assert.deepEqual(METRICS, ['rhr', 'sleep_eff', 'steps', 'hrv']);
@@ -15,13 +15,6 @@ test('every metric has metadata and noise', () => {
   }
 });
 
-test('three profiles, each with a mean per metric', () => {
-  assert.equal(PROFILES.length, 3);
-  for (const p of PROFILES) {
-    assert.ok(p.id && p.name);
-    for (const m of METRICS) assert.equal(typeof p.means[m], 'number');
-  }
-});
 
 test('roundMetric clamps and rounds per metric', () => {
   assert.equal(roundMetric('steps', 9003.7), 9004);
