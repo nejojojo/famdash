@@ -1,9 +1,5 @@
 {
-<<<<<<< Updated upstream
-  "generated_at": "2026-06-05T07:49:06.939Z",
-=======
-  "generated_at": "2026-06-05T08:24:49.573Z",
->>>>>>> Stashed changes
+  "generated_at": "2026-06-05T08:27:20.967Z",
   "simulated": true,
   "scenario": "all_normal",
   "scenario_member": null,
@@ -898,10 +894,10 @@
       ],
       "today": {
         "date": "2026-06-05",
-        "rhr": 58,
-        "hrv": 63,
-        "sleep_eff": 90,
-        "steps": 8800
+        "rhr": null,
+        "hrv": 49.410241901878,
+        "sleep_eff": null,
+        "steps": 122
       },
       "feed_state": "ok"
     }
@@ -980,46 +976,52 @@
       }
     }
   },
-<<<<<<< Updated upstream
   "report": {
     "date": "2026-06-05",
-    "headline": "Family Health Report: All members show metrics within typical ranges for today.",
+    "headline": "A mostly clear day for the family, with one member showing some notable changes in activity and recovery.",
     "members": [
       {
         "name": "Mom",
         "status": "all_clear",
-        "summary": "Mom's metrics for today are all within her typical range, indicating a good day of recovery.",
+        "summary": "All her metrics are well within her typical ranges for today, indicating a normal day.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Dad",
         "status": "all_clear",
-        "summary": "Dad's health metrics are within his normal baseline today, suggesting a typical day.",
+        "summary": "All his metrics are well within his typical ranges for today, indicating a normal day.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Sister",
         "status": "all_clear",
-        "summary": "Sister's data for today shows her metrics are consistent with her personal baseline.",
+        "summary": "All her metrics are well within her typical ranges for today, indicating a normal day.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Me",
-        "status": "all_clear",
-        "summary": "All of my recorded metrics are within my typical range today.",
-        "changed_signals": [],
-        "suggestion": ""
+        "status": "worth_noting",
+        "summary": "Today's data shows significantly lower steps and heart rate variability (HRV) compared to usual, with resting heart rate and sleep efficiency data missing.",
+        "changed_signals": [
+          {
+            "metric": "steps",
+            "z": -3.55,
+            "phrase": "Steps were significantly lower than usual."
+          },
+          {
+            "metric": "hrv",
+            "z": -2.69,
+            "phrase": "Heart rate variability (HRV) was noticeably lower than usual."
+          }
+        ],
+        "suggestion": "It might be worth a brief check-in to see how you are feeling, especially with the missing data for RHR and sleep efficiency. Consider ensuring your device synced completely."
       }
     ]
   },
   "report_valid": true,
-=======
-  "report": null,
-  "report_valid": false,
->>>>>>> Stashed changes
   "eval": {
     "scenario_applied": false,
     "scenario_family": "all_normal",
@@ -1031,11 +1033,7 @@
     "gate_fired": false,
     "scenario_pool_size": 0,
     "scenario_pool_valid": 0,
-<<<<<<< Updated upstream
-    "llm_ms": 15699,
-=======
-    "llm_ms": 7630,
->>>>>>> Stashed changes
+    "llm_ms": 13101,
     "model": "gemini-2.5-flash",
     "telegram_ok": true
   }
