@@ -384,8 +384,8 @@ function render(data){
 
   document.getElementById('sim').textContent =
     data.simulated ? '⚠︎ Synthetic demo data — not real health measurements; no action needed.' : '';
-  document.getElementById(‘legend’).innerHTML =
-    ‘Each dot reflects how that day compares to the person’s own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.  ·  <span style="color:var(--green)">● real</span> = live data, demo = simulated.’;
+  document.getElementById('legend').innerHTML =
+    `Each dot reflects how that day compares to the person's own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.  ·  <span style="color:var(--green)">● real</span> = live data, demo = simulated.`;
 
   if (!data.report || data.report_valid === false){
     reportEl.className = 'report report--plain';
