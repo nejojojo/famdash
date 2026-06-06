@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Family Health Analyst — Members</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --canvas:#ffffff;       /* flat white page */
+    --shell:#ffffff;        /* floating white container */
+    --card:#ffffff;
+    --soft:#f4f7f8;         /* soft fill */
+    --mint:#eef6f4;         /* sage/mint tint */
+    --ink:#1f2b30;
+    --ink2:#3c4c53;
+    --muted:#7d8b92;
+    --faint:#9aa6ac;
+    --line:#e7edef;
+    --teal:#4a9d8e;
+    --teal-2:#5bb0a0;
+    --teal-deep:#2f6b62;
+    --green:#4aa37a;
+    --amber:#d9a23a;
+    --grey:#9aa6ac;
+    --shadow:0 8px 24px rgba(20,40,60,.06);
+    --shadow-lg:0 16px 40px rgba(20,40,60,.10);
+    --r:18px;
+    --r-sm:12px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { width: 80%; margin: 0 auto; padding: 22px 0 40px; }
+  .shell { background: var(--shell); }
+
+  /* ── Top nav ──────────────────────────────────────────── */
+  .nav {
+    display: flex; align-items: center; gap: 18px;
+    padding-bottom: 18px; border-bottom: 1px solid var(--line);
+  }
+  .brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:18px; letter-spacing:-.2px; }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--teal-2), var(--teal-deep));
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff; font-size:14px; box-shadow: 0 4px 10px rgba(47,107,98,.35);
+  }
+  .navlinks { display:flex; gap:22px; margin: 0 auto; font-size:14px; }
+  .navlinks a { color: var(--muted); text-decoration:none; padding:4px 2px; }
+  .navlinks a.active { color: var(--ink); font-weight:600; position:relative; }
+  .navlinks a.active::after {
+    content:""; position:absolute; left:0; right:0; bottom:-19px; height:2px;
+    background: var(--teal); border-radius:2px;
+  }
+  .userchip { display:flex; align-items:center; gap:10px; }
+  .userchip .avatar {
+    width:38px; height:38px; border-radius:50%;
+    background: linear-gradient(135deg, var(--teal-2), var(--teal-deep));
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;
+  }
+  .userchip .u-name { font-size:14px; font-weight:600; line-height:1.2; }
+
+  /* ── Greeting ─────────────────────────────────────────── */
+  .greet { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin: 26px 0 6px; }
+  .greet h1 { font-size: 30px; font-weight: 600; letter-spacing:-.5px; margin:0; color: var(--ink); }
+  .last-update { margin: 5px 0 0; color: var(--faint); font-size: 12.5px; }
+  .legend { color: var(--muted); font-size: 12.5px; margin: 14px 0 20px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .add-member {
+    background: linear-gradient(135deg, var(--teal-2), var(--teal-deep)); color:#fff; border:0;
+    border-radius:12px; padding:10px 16px; font:inherit; font-size:14px; font-weight:600;
+    cursor:pointer; box-shadow: 0 8px 20px rgba(47,107,98,.28); flex-shrink:0;
+  }
+  .add-member:hover { filter: brightness(1.04); }
+
+  .section-h { display:flex; align-items:center; gap:9px; margin: 4px 0 14px; font-size:13px; color: var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase; }
+
+  /* ── Master–detail split ──────────────────────────────── */
+  .members-split { display:grid; grid-template-columns: 280px 1fr; gap: 18px; align-items:start; }
+  @media (max-width: 760px) { .members-split { grid-template-columns: 1fr; } }
+
+  .member-list { display:flex; flex-direction:column; gap:8px; }
+  .member-item {
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    padding:12px 14px; border-radius:var(--r-sm); border:1px solid var(--line);
+    background:#fff; cursor:pointer; font:inherit; box-shadow:var(--shadow); transition:background .12s;
+  }
+  .member-item:hover { background: var(--mint); }
+  .member-item.active { border-color: var(--teal-2); box-shadow:0 0 0 2px rgba(91,176,160,.18); }
+  .member-item .c-avatar {
+    width:34px; height:34px; border-radius:10px; background:var(--mint); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-weight:600; color:var(--teal-deep);
+  }
+  .member-item .mi-name { font-weight:600; font-size:14px; }
+  .member-item .mi-sub { font-size:11px; color:var(--faint); }
+
+  /* ── Detail card ──────────────────────────────────────── */
+  .card {
+    background: var(--card); border-radius: var(--r); padding: 22px 22px 18px;
+    box-shadow: var(--shadow); border:1px solid var(--line);
+  }
+  .detail-head { display:flex; align-items:center; gap:13px; margin-bottom: 18px; }
+  .detail-head .c-avatar {
+    width:46px; height:46px; border-radius:14px; background: var(--mint); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:18px; color: var(--teal-deep);
+  }
+  .detail-head h2 { margin:0; font-size:20px; font-weight:600; letter-spacing:-.3px; }
+  .detail-head .sub { color: var(--faint); font-size: 12px; margin: 1px 0 0; }
+  .c-badge { margin-left:auto; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; }
+  .cb-all_clear { background: var(--mint); color: var(--teal-deep); }
+  .cb-worth_noting { background:#fbf1dc; color:#9a6f15; }
+  .cb-no_data { background:#eef1f3; color: var(--muted); }
+  .device-tag {
+    display:inline-flex; align-items:center; gap:4px; vertical-align:middle;
+    background: var(--mint); color: var(--teal-deep);
+    border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; letter-spacing:.2px;
+  }
+
+  /* ── Today's metric strip (horizontal, 4-up) ──────────── */
+  .metrics { display:flex; gap:10px; flex-wrap:wrap; }
+  .metric {
+    flex:1 1 0; min-width:108px; background: var(--soft);
+    border-radius: var(--r-sm); padding: 10px 12px;
+  }
+  .metric .m-name { display:flex; align-items:center; gap:6px; color: var(--ink2); font-size:11.5px; }
+  .metric .m-val { display:block; margin-top:3px; color: var(--ink); font-weight:600; font-size:14px; }
+  .metric .m-sigma { color: var(--faint); font-weight:400; font-size:11px; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .tier { display:block; margin-top:2px; font-size:11px; color:var(--faint); }
+
+  /* ── Trend charts ─────────────────────────────────────── */
+  .chart-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .chart-cell { background: var(--soft); border-radius: var(--r-sm); padding: 12px 12px 8px; height: 180px; }
+  .chart-cell canvas { display:block; width:100% !important; height:100% !important; }
+  @media (max-width: 560px) { .chart-grid { grid-template-columns: 1fr; } }
+
+  /* ── Per-day selector + day-vs-average bars ───────────── */
+  .day-select-row { display:flex; align-items:center; gap:10px; margin: 22px 0 0; }
+  .day-select-row label { color: var(--muted); font-size:13px; font-weight:600; }
+  .day-select-row select, .day-select-row input[type="date"] {
+    background:#fff; color:var(--ink); border:1px solid var(--line);
+    border-radius:10px; padding:7px 11px; font:inherit; box-shadow:var(--shadow); cursor:pointer;
+  }
+  .day-bars { display:flex; flex-direction:column; gap:11px; margin-top: 12px; }
+  .day-bar-row { display:grid; grid-template-columns: 92px 1fr 120px; align-items:center; gap:12px; }
+  .db-label { color: var(--ink2); font-size:12.5px; }
+  .db-track { position:relative; height:18px; background: var(--soft); border-radius:9px; overflow:hidden; }
+  .db-fill { position:absolute; left:0; top:0; bottom:0; border-radius:9px 0 0 9px; }
+  .db-avg { position:absolute; top:0; bottom:0; width:2px; background: rgba(31,43,48,.5); }
+  .db-val { font-size:12.5px; font-weight:600; color: var(--ink); text-align:right; }
+  .db-val .db-sigma { color: var(--faint); font-weight:400; font-size:11px; }
+
+  .error { background:#fff; border-radius: var(--r); padding:22px 26px; box-shadow: var(--shadow); border:1px solid var(--line); }
+  .error h2 { margin:0 0 8px; font-size:18px; }
+  .error .signals { color: var(--muted); }
+  footer { color: var(--muted); font-size: 12.5px; margin-top: 26px; padding-top:16px; border-top:1px solid var(--line); }
+
+  @media (max-width: 640px) {
+    .navlinks { display:none; }
+    .greet h1 { font-size:24px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+ <div class="shell">
+
+  <!-- Top nav -->
+  <nav class="nav">
+    <div class="brand"><span class="mark">✦</span> Famdash</div>
+    <div class="navlinks">
+      <a href="index.html">Dashboard</a>
+      <a href="members.html" class="active">Members</a>
+    </div>
+    <div class="userchip">
+      <div class="avatar">B</div>
+      <div>
+        <div class="u-name">Benardi Family</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Heading -->
+  <div class="greet">
+    <div>
+      <h1>Members</h1>
+      <p class="last-update" id="lastUpdate"></p>
+    </div>
+    <button type="button" class="add-member" id="addMember">+ Add family member</button>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <!-- Master (list) | detail (numbers + charts) -->
+  <div class="members-split">
+    <div class="member-list" id="memberList"></div>
+    <div class="member-detail" id="memberDetail">Loading…</div>
+  </div>
+
+  <footer id="footer"></footer>
+ </div>
+</div>
+
+<script type="module">
+const METRICS = ['rhr','sleep_eff','steps','hrv'];
+const META = {
+  rhr:{label:'Resting HR',unit:'bpm'},
+  sleep_eff:{label:'Sleep eff.',unit:'%'},
+  steps:{label:'Steps',unit:''},
+  hrv:{label:'HRV',unit:'ms'},
+};
+const STATUS_LABEL = { all_clear:'all clear', worth_noting:'worth a check-in', no_data:'no data today' };
+
+function z(v, b){ if(v==null||!b||b.mean==null) return null; if(!b.std) return 0; return (v-b.mean)/b.std; }
+function tier(zv){ return (zv!=null && Math.abs(zv) >= 1.5) ? 'out' : 'in'; }
+function tierColor(t){ return t==='out' ? '#d9a23a' : '#4aa37a'; }
+function tierGlyph(t){ return t==='out' ? '▲' : '○'; }
+function tierWord(t){ return t==='out' ? 'watch' : 'normal'; }
+function daysSinceSync(mem){
+  if (mem.today) return 0;
+  let n = 1;
+  for (let i = mem.history.length - 1; i >= 0; i--){ if (mem.history[i] && mem.history[i].rhr == null) n++; else break; }
+  return n;
+}
+function fmtLocal(iso){
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+async function loadJSON(url){
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
+}
+// Display formatter: integers as-is (steps), otherwise 1 decimal (so a raw 49.410241… reads 49.4).
+function fmtVal(v){ return (v==null) ? '—' : (Number.isInteger(v) ? v : Math.round(v*10)/10); }
+
+let DATA = null;
+let charts = [];
+let selectedId = null;
+let selectedDate = null;
+
+function statusFor(mem){
+  return (DATA.report?.members || []).find(m => m.name === mem.name)?.status;
+}
+function seriesOf(mem){ return [...mem.history, ...(mem.today ? [mem.today] : [])]; }
+function dayHasData(d){ return d && METRICS.some(m => d[m] != null); }
+// Real members (e.g. Me) float to the top of the list; others keep their order.
+function orderedMembers(){ return [...DATA.members].sort((a,b) => (b.real?1:0) - (a.real?1:0)); }
+
+function renderList(){
+  const list = document.getElementById('memberList');
+  list.innerHTML = '';
+  for (const mem of orderedMembers()){
+    const status = statusFor(mem);
+    const initial = (mem.name||'?').trim().charAt(0).toUpperCase();
+    const badge = status ? `<span class="c-badge cb-${status}">${STATUS_LABEL[status]||status}</span>` : '';
+    const sub = mem.real ? (mem.device || 'live data') : 'demo';
+    const btn = document.createElement('button');
+    btn.className = 'member-item' + (mem.id === selectedId ? ' active' : '');
+    btn.innerHTML = `<div class="c-avatar">${initial}</div>
+      <div><div class="mi-name">${mem.name}</div><div class="mi-sub">${sub}</div></div>${badge}`;
+    btn.onclick = () => { selectedId = mem.id; renderList(); renderDetail(); };
+    list.appendChild(btn);
+  }
+}
+
+function renderDetail(){
+  charts.forEach(c => { try { c.destroy(); } catch {} });
+  charts = [];
+  const mem = DATA.members.find(m => m.id === selectedId);
+  const detail = document.getElementById('memberDetail');
+  if (!mem){ detail.innerHTML = ''; return; }
+
+  const base = DATA.baselines[mem.id];
+  const status = statusFor(mem);
+  const initial = (mem.name||'?').trim().charAt(0).toUpperCase();
+  const badge = status ? `<span class="c-badge cb-${status}">${STATUS_LABEL[status]||status}</span>` : '';
+  const tag = mem.real ? '<span class="tier" style="color:var(--green)">● real</span>' : '<span class="tier">demo</span>';
+  const deviceTag = mem.device ? ` <span class="device-tag">⌚ ${mem.device}</span>` : '';
+  const gap = daysSinceSync(mem);
+  const stateNote = mem.today ? '' : `<p class="sub">last synced ${gap} day${gap===1?'':'s'} ago</p>`;
+
+  // days that actually have data, newest first → drives the day selector
+  const dataDays = seriesOf(mem).filter(dayHasData).map(d => d.date).sort((a,b) => a<b?1:a>b?-1:0);
+  selectedDate = dataDays.includes(selectedDate) ? selectedDate : (dataDays[0] || null);
+
+  detail.innerHTML = `<div class="card">
+    <div class="detail-head">
+      <div class="c-avatar">${initial}</div>
+      <div><h2>${mem.name}${deviceTag} ${tag}</h2>${stateNote}</div>
+      ${badge}
+    </div>
+
+    <div class="section-h">30-day trend <span style="text-transform:none;font-weight:400;color:var(--faint)">· each point = 1 day, dashed = average</span></div>
+    <div class="chart-grid">${METRICS.map(m=>`<div class="chart-cell"><canvas id="dc-${m}" aria-label="${mem.name} ${META[m].label} 30-day trend"></canvas></div>`).join('')}</div>
+
+    <div class="day-select-row">
+      <label for="daySel">Day</label>
+      ${dataDays.length ? `<input type="date" id="daySel" min="${dataDays[dataDays.length-1]}" max="${dataDays[0]}" value="${selectedDate}" />` : '<span class="sub">no daily data yet</span>'}
+    </div>
+    <div id="dayPanel"></div>
+  </div>`;
+
+  if (typeof Chart !== 'undefined'){
+    for (const metric of METRICS){
+      const series = seriesOf(mem);
+      const labels = series.map(d => d.date.slice(5));
+      const values = series.map(d => d[metric]);
+      const b = base[metric];
+      const band = (k) => labels.map(() => b.mean==null ? null : b.mean + k*b.std);
+      charts.push(new Chart(document.getElementById(`dc-${metric}`), {
+        type:'line',
+        data:{ labels, datasets:[
+          { label:'+1σ', data:band(1), borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(74,157,142,0.12)' },
+          { label:'-1σ', data:band(-1), borderWidth:0, pointRadius:0, fill:false },
+          { label:'avg', data:band(0), borderColor:'rgba(125,139,146,0.7)', borderWidth:1, borderDash:[4,3], pointRadius:0, fill:false },
+          { label:META[metric].label, data:values, borderColor:'#4a9d8e', borderWidth:2, pointRadius:2, pointBackgroundColor:'#4a9d8e', tension:0.3, spanGaps:false },
+        ]},
+        options:{ animation:false, responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, title:{display:true,text:META[metric].label,color:'#7d8b92',font:{size:12,weight:'600'}} },
+          scales:{
+            x:{ grid:{display:false}, border:{display:false}, ticks:{color:'#9aa6ac',maxTicksLimit:6,font:{size:10}} },
+            y:{ grid:{color:'#eef2f4'}, border:{display:false}, ticks:{color:'#9aa6ac',font:{size:10}} }
+          } }
+      }));
+    }
+  }
+
+  const daySel = document.getElementById('daySel');
+  if (daySel){
+    daySel.value = selectedDate;
+    daySel.onchange = () => { selectedDate = daySel.value; renderDay(mem, base); };
+  }
+  renderDay(mem, base);
+}
+
+// Render the per-day panel: stat tiles + "day vs personal average" bars.
+const AVG_POS = 56;  // % of the track where the average marker sits
+function renderDay(mem, base){
+  const panel = document.getElementById('dayPanel');
+  if (!panel) return;
+  if (!selectedDate){ panel.innerHTML = ''; return; }
+  const day = seriesOf(mem).find(d => d.date === selectedDate) || {};
+
+  const rows = METRICS.map(metric => {
+    const v = day[metric] == null ? null : day[metric];
+    const zv = z(v, base[metric]);
+    const t = tier(zv);
+    const shown = fmtVal(v);
+    const sigma = zv==null ? '' : `(${zv>=0?'+':''}${zv.toFixed(1)}σ)`;
+    return `<div class="metric">
+      <span class="m-name"><span class="dot" style="background:${zv==null?'#9aa6ac':tierColor(t)}" aria-hidden="true"></span>${META[metric].label}</span>
+      <span class="m-val">${shown} ${META[metric].unit} <span class="m-sigma">${sigma}</span></span>
+      <span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span>
+    </div>`;
+  }).join('');
+
+  const bars = METRICS.map(metric => {
+    const v = day[metric] == null ? null : day[metric];
+    const avg = base[metric]?.mean;
+    const zv = z(v, base[metric]);
+    const color = v==null ? 'var(--grey)' : tierColor(tier(zv));
+    // normalise per metric so the average always sits at AVG_POS%; bar fills proportionally
+    const w = (v!=null && avg) ? Math.max(2, Math.min(100, (v/avg)*AVG_POS)) : 0;
+    const valTxt = v==null ? '—' : `${fmtVal(v)} ${META[metric].unit}`;
+    return `<div class="day-bar-row">
+      <span class="db-label">${META[metric].label}</span>
+      <div class="db-track"><div class="db-fill" style="width:${w}%;background:${color}"></div><div class="db-avg" style="left:${AVG_POS}%"></div></div>
+      <span class="db-val">${valTxt}</span>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="section-h" style="margin-top:18px">Daily data — ${selectedDate}</div>
+    <div class="metrics">${rows}</div>
+    <div class="section-h" style="margin-top:18px">Day vs personal average <span style="text-transform:none;font-weight:400;color:var(--faint)">· vertical line = average</span></div>
+    <div class="day-bars">${bars}</div>`;
+}
+
+async function main(){
+  try { DATA = await loadJSON('data.json'); }
+  catch (e) {
+    document.getElementById('memberList').innerHTML = '';
+    document.getElementById('memberDetail').innerHTML =
+      `<div class="error"><h2>Couldn't load data</h2><p class="signals">Details: ${e.message}.</p></div>`;
+    return;
+  }
+  document.getElementById('lastUpdate').textContent =
+    DATA.generated_at ? `Last update: ${fmtLocal(DATA.generated_at)}` : '';
+  document.getElementById('legend').innerHTML =
+    `<span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span> · shaded band = personal normal range (±1σ)`;
+  selectedId = orderedMembers()[0]?.id || null;
+  renderList();
+  renderDetail();
+}
+
+main();
+</script>
+</body>
+</html>

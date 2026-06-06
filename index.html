@@ -4,11 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Family Health Analyst</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
 <style>
   :root {
-    --canvas:#e9edf0;       /* soft warm-grey page */
+    --canvas:#ffffff;       /* flat white page */
     --shell:#ffffff;        /* floating white container */
     --card:#ffffff;
     --soft:#f4f7f8;         /* soft fill */
@@ -37,14 +36,11 @@
     font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .page { max-width: 1180px; margin: 0 auto; padding: 22px 22px 40px; }
+  .page { width: 80%; margin: 0 auto; padding: 22px 0 40px; }
 
   /* ── Floating white shell ─────────────────────────────── */
   .shell {
     background: var(--shell);
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
-    padding: 22px 26px 30px;
   }
 
   /* ── Top nav ──────────────────────────────────────────── */
@@ -78,19 +74,16 @@
   /* ── Greeting + vitals strip ──────────────────────────── */
   .greet { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin: 26px 0 6px; }
   .greet h1 { font-size: 30px; font-weight: 600; letter-spacing:-.5px; margin:0; color: var(--ink); }
-
-  /* ── Synthetic notice ─────────────────────────────────── */
-  .sim { color: var(--amber); font-size: 13px; font-weight:600; margin: 16px 0 0; display:none; }
-  .sim:not(:empty) { display:flex; align-items:center; gap:8px;
-    background:#fbf4e6; border:1px solid #f0e2c2; padding:9px 13px; border-radius:10px; }
+  .last-update { margin: 5px 0 0; color: var(--faint); font-size: 12.5px; }
 
   /* ── Day controls (in nav-ish toolbar) ────────────────── */
-  .controls { display:flex; align-items:center; gap:10px; margin: 18px 0 4px; flex-wrap:wrap; }
+  .controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .controls label { color: var(--muted); font-size:13px; }
-  select {
+  select, input[type="date"] {
     background:#fff; color:var(--ink); border:1px solid var(--line);
     border-radius:10px; padding:7px 11px; font:inherit; box-shadow: var(--shadow);
   }
+  input[type="date"] { cursor:pointer; }
   .controls .navbtn {
     background:#fff; color:var(--ink2); border:1px solid var(--line);
     border-radius:10px; padding:7px 12px; cursor:pointer; box-shadow: var(--shadow); font:inherit;
@@ -105,7 +98,7 @@
   .report {
     background: linear-gradient(135deg, var(--teal-2) 0%, var(--teal-deep) 100%);
     color:#eafaf6;
-    border-radius: var(--r); padding: 22px 26px; margin-bottom: 22px;
+    border-radius: var(--r); padding: 22px 26px;
     box-shadow: 0 14px 34px rgba(47,107,98,.28);
   }
   .report .r-eyebrow { font-size:11px; text-transform:uppercase; letter-spacing:.6px; opacity:.8; margin:0 0 6px; }
@@ -135,7 +128,7 @@
   .section-h { display:flex; align-items:center; gap:9px; margin: 4px 0 14px; font-size:13px; color: var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase; }
 
   /* ── Member cards ─────────────────────────────────────── */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px,1fr)); gap: 18px; }
+  .cards { display: flex; flex-direction: column; gap: 14px; }
   .card {
     background: var(--card); border-radius: var(--r); padding: 20px 20px 16px;
     box-shadow: var(--shadow); border:1px solid var(--line); position:relative; overflow:hidden;
@@ -151,6 +144,11 @@
     display:flex; align-items:center; justify-content:center; font-weight:600; color: var(--teal-deep);
   }
   .card h3 { margin: 0; font-size: 16px; font-weight:600; }
+  .device-tag {
+    display:inline-flex; align-items:center; gap:4px; vertical-align:middle;
+    background: var(--mint); color: var(--teal-deep);
+    border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; letter-spacing:.2px;
+  }
   .card .sub { color: var(--faint); font-size: 12px; margin: 1px 0 0; }
   .card .c-badge {
     margin-left:auto; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px;
@@ -159,20 +157,21 @@
   .cb-worth_noting { background:#fbf1dc; color:#9a6f15; }
   .cb-no_data { background:#eef1f3; color: var(--muted); }
 
-  .metric-row {
-    display:flex; justify-content: space-between; align-items:center;
-    font-size: 13.5px; padding: 8px 0; border-top:1px solid var(--line);
+  /* ── Today's metric strip (horizontal, 4-up) ──────────── */
+  .metrics { display:flex; gap:10px; flex-wrap:wrap; }
+  .metric {
+    flex:1 1 0; min-width:88px; background: var(--soft);
+    border-radius: var(--r-sm); padding: 9px 11px;
   }
-  .metric-row:first-of-type { border-top:0; }
-  .metric-row .m-name { color: var(--ink2); }
-  .metric-row .m-val { color: var(--ink); font-weight:600; }
-  .metric-row .m-sigma { color: var(--faint); font-weight:400; font-size:12px; margin-left:4px; }
-  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle; }
-  .tier { font-size:11px; color:var(--faint); margin-left:7px; }
+  .metric .m-name { display:flex; align-items:center; gap:6px; color: var(--ink2); font-size:11.5px; }
+  .metric .m-val { display:block; margin-top:3px; color: var(--ink); font-weight:600; font-size:14px; }
+  .metric .m-sigma { color: var(--faint); font-weight:400; font-size:11px; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .tier { display:block; margin-top:2px; font-size:11px; color:var(--faint); }
 
-  .chart-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-  .chart-cell { background: var(--soft); border-radius: var(--r-sm); padding: 8px 8px 6px; height: 118px; }
-  .chart-cell canvas { display:block; width:100% !important; height:100% !important; }
+  /* ── Two-column split: summary (left) | data (right) ──── */
+  .split { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items:start; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
 
   footer { color: var(--muted); font-size: 12.5px; margin-top: 26px; padding-top:16px; border-top:1px solid var(--line); }
 
@@ -183,6 +182,14 @@
 
   /* ── Report header + Telegram button ──────────────────── */
   .r-top { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:6px; }
+  .r-eyebrow-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .r-eyebrow-wrap .r-eyebrow { margin:0; }
+  .ai-tag {
+    display:inline-flex; align-items:center; gap:5px; flex-shrink:0;
+    background: rgba(255,255,255,.18); color:#fff; border:1px solid rgba(255,255,255,.32);
+    border-radius:999px; padding:3px 10px; font-size:11px; font-weight:600; letter-spacing:.2px;
+  }
+  .report--plain .ai-tag { background: var(--mint); color: var(--teal-deep); border-color: transparent; }
   .tg-btn {
     display:inline-flex; align-items:center; gap:7px; flex-shrink:0;
     background: rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.28);
@@ -257,45 +264,38 @@
   <nav class="nav">
     <div class="brand"><span class="mark">✦</span> Famdash</div>
     <div class="navlinks">
-      <a href="#" class="active">Dashboard</a>
+      <a href="index.html" class="active">Dashboard</a>
+      <a href="members.html">Members</a>
     </div>
     <div class="userchip">
-      <div class="avatar">F</div>
+      <div class="avatar">B</div>
       <div>
-        <div class="u-name">Family</div>
-        <div class="u-sub">daily glance</div>
+        <div class="u-name">Benardi Family</div>
       </div>
     </div>
   </nav>
 
-  <!-- Greeting -->
+  <!-- Greeting + day navigation -->
   <div class="greet">
     <div>
-      <h1>Welcome back</h1>
+      <h1>Benardi Family Health Dashboard</h1>
+      <p class="last-update" id="lastUpdate"></p>
     </div>
-  </div>
-
-  <!-- Synthetic-data notice -->
-  <div class="sim" id="sim"></div>
-
-  <!-- Day navigation -->
-  <div class="controls" id="controls" style="display:none">
-    <button class="navbtn" id="prev" title="Previous day">‹ Prev</button>
-    <label for="daysel">Day</label>
-    <select id="daysel"></select>
-    <button class="navbtn" id="next" title="Next day">Next ›</button>
-    <span class="hint" id="dayhint"></span>
+    <div class="controls" id="controls" style="display:none">
+      <button class="navbtn" id="prev" title="Previous day">‹ Prev</button>
+      <input type="date" id="daysel" />
+      <button class="navbtn" id="next" title="Next day">Next ›</button>
+    </div>
   </div>
 
   <!-- Legend explainer -->
   <div class="legend" id="legend"></div>
 
-  <!-- Report (teal gradient feature card) -->
-  <div class="report" id="report">Loading…</div>
-
-  <!-- Per-member cards -->
-  <div class="section-h">Family members</div>
-  <div class="cards" id="cards"></div>
+  <!-- Two columns: summary (left) | today's data (right) -->
+  <div class="split">
+    <div class="report" id="report">Loading…</div>
+    <div class="cards" id="cards"></div>
+  </div>
 
   <footer id="footer"></footer>
  </div>
@@ -309,7 +309,7 @@
     <p class="modal-help">For demo purposes — the daily report is automatically sent every day at 10pm.</p>
 
     <section class="modal-sec">
-      <h3>Join the family group</h3>
+      <h3>1. Join the family group</h3>
       <p class="modal-help">Scan the code with your phone to open the group in Telegram.</p>
       <div class="qr-wrap"><div id="tgQr"></div></div>
       <a class="modal-link" id="tgLink" href="#" target="_blank" rel="noopener">Open in Telegram ↗</a>
@@ -320,7 +320,7 @@
     </section>
 
     <section class="modal-sec">
-      <h3>Send today's report now</h3>
+      <h3>2. Send today's report now</h3>
       <p class="modal-help">Triggers the GitHub Action that runs the analyst and posts the report to the bot. It lands in the group in 1–2 minutes.</p>
       <button class="tg-run" id="tgRun">Run now</button>
       <p class="modal-status" id="tgStatus" role="status"></p>
@@ -356,7 +356,6 @@ function daysSinceSync(mem){
   return n;
 }
 const operator = new URLSearchParams(location.search).get('operator') === '1';
-let charts = [];   // track live Chart instances so we can destroy them on re-render
 
 function showError(msg){
   document.getElementById('legend').textContent = '';
@@ -372,35 +371,38 @@ async function loadJSON(url){
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return res.json();
 }
+// Display formatter: integers as-is (steps), otherwise 1 decimal (so a raw 49.410241… reads 49.4).
+function fmtVal(v){ return (v==null) ? '—' : (Number.isInteger(v) ? v : Math.round(v*10)/10); }
 
-// Render one full day's store (report + cards + 30-day charts). Re-runnable.
+// Render one full day's store (report + today's metric cards). Re-runnable.
 function render(data){
-  // tear down previous charts and content so switching days is clean
-  charts.forEach(c => { try { c.destroy(); } catch {} });
-  charts = [];
   document.getElementById('cards').innerHTML = '';
   const reportEl = document.getElementById('report');
   reportEl.className = 'report';
 
-  document.getElementById('sim').textContent =
-    data.simulated ? '⚠︎ Synthetic demo data — not real health measurements; no action needed.' : '';
   document.getElementById('legend').innerHTML =
-    `Each dot reflects how that day compares to the person's own normal range: <span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span>.  ·  <span style="color:var(--green)">● real</span> = live data, demo = simulated.`;
+    `<span style="color:var(--green)">○ normal</span> · <span style="color:var(--amber)">▲ worth a look</span> · <span style="color:var(--green)">● real</span> = live · demo = simulated`;
 
   if (!data.report || data.report_valid === false){
     reportEl.className = 'report report--plain';
     reportEl.innerHTML = `
       <div class="r-top">
-        <p class="r-eyebrow">Daily family report</p>
+        <div class="r-eyebrow-wrap">
+          <p class="r-eyebrow">Daily family report</p>
+          <span class="ai-tag">✦ AI Health Analyst</span>
+        </div>
         <button type="button" class="tg-btn" id="tgOpen">📩 Get telegram daily report</button>
       </div>
       <h2>Summary unavailable for this day</h2>
-      <p class="signals">The analyst report couldn't be generated for this run. The trends below are still shown.</p>`;
+      <p class="signals">The analyst report couldn't be generated for this run. Today's metrics are still shown.</p>`;
   } else {
     const rep = data.report;
     reportEl.innerHTML = `
       <div class="r-top">
-        <p class="r-eyebrow">Daily family report</p>
+        <div class="r-eyebrow-wrap">
+          <p class="r-eyebrow">Daily family report</p>
+          <span class="ai-tag">✦ AI Health Analyst</span>
+        </div>
         <button type="button" class="tg-btn" id="tgOpen">📩 Get telegram daily report</button>
       </div>
       <h2>${rep.headline} <span class="r-date">— ${rep.date}</span></h2>
@@ -432,11 +434,12 @@ function render(data){
       const v = mem.today ? mem.today[metric] : null;
       const zv = z(v, base[metric]);
       const t = tier(zv);
-      const shown = v==null ? '—' : v;
+      const shown = fmtVal(v);
       const sigma = zv==null ? '' : `(${zv>=0?'+':''}${zv.toFixed(1)}σ)`;
-      return `<div class="metric-row">
+      return `<div class="metric">
         <span class="m-name"><span class="dot" style="background:${zv==null?'#9aa6ac':tierColor(t)}" aria-hidden="true"></span>${META[metric].label}</span>
-        <span class="m-val">${shown} ${META[metric].unit} <span class="m-sigma">${sigma}</span><span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span></span>
+        <span class="m-val">${shown} ${META[metric].unit} <span class="m-sigma">${sigma}</span></span>
+        <span class="tier">${zv==null?'—':tierGlyph(t)+' '+tierWord(t)}</span>
       </div>`;
     }).join('');
     const badge = status ? `<span class="c-badge cb-${status}">${STATUS_LABEL[status]||status}</span>` : '';
@@ -452,42 +455,27 @@ function render(data){
     card.innerHTML = `
       <div class="c-head">
         <div class="c-avatar">${initial}</div>
-        <div><h3>${mem.name} ${tag}</h3>${sub}</div>
+        <div><h3>${mem.name}${mem.device?` <span class="device-tag">⌚ ${mem.device}</span>`:''} ${tag}</h3>${sub}</div>
         ${badge}
       </div>
-      ${rows}
-      <div class="chart-grid">${METRICS.map(m=>`<div class="chart-cell"><canvas id="c-${mem.id}-${m}" height="120" aria-label="${mem.name} ${META[m].label} 30-day trend"></canvas></div>`).join('')}</div>`;
+      <div class="metrics">${rows}</div>`;
     cards.appendChild(card);
-
-    if (typeof Chart === 'undefined') continue;
-    for (const metric of METRICS){
-      const series = [...mem.history, ...(mem.today?[mem.today]:[])];
-      const labels = series.map(d=>d.date.slice(5));
-      const values = series.map(d=>d[metric]);
-      const b = base[metric];
-      const band = (k)=> labels.map(()=> b.mean==null?null : b.mean + k*b.std);
-      charts.push(new Chart(document.getElementById(`c-${mem.id}-${metric}`), {
-        type:'line',
-        data:{ labels, datasets:[
-          { label:'+1σ', data:band(1), borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(74,157,142,0.12)' },
-          { label:'-1σ', data:band(-1), borderWidth:0, pointRadius:0, fill:false },
-          { label:META[metric].label, data:values, borderColor:'#4a9d8e', borderWidth:2, pointRadius:1, pointBackgroundColor:'#4a9d8e', tension:0.3, spanGaps:false },
-        ]},
-        options:{ animation:false, responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false}, title:{display:true,text:META[metric].label,color:'#7d8b92',font:{size:11,weight:'600'}} },
-          scales:{
-            x:{ grid:{display:false}, border:{display:false}, ticks:{color:'#9aa6ac',maxTicksLimit:5,font:{size:10}} },
-            y:{ grid:{color:'#eef2f4'}, border:{display:false}, ticks:{color:'#9aa6ac',font:{size:10}} }
-          } }
-      }));
-    }
   }
 
-  const when = `As of ${data.generated_at}`;
+  document.getElementById('lastUpdate').textContent =
+    data.generated_at ? `Last update: ${fmtLocal(data.generated_at)}` : '';
   document.getElementById('footer').textContent = operator
-    ? `${when} · scenario (operator): ${data.scenario}${data.scenario_member?` → ${data.scenario_member}`:''}`
+    ? `scenario (operator): ${data.scenario}${data.scenario_member?` → ${data.scenario_member}`:''}`
       + (data.eval ? ` · detected=${data.eval.detected} · false_positives=${JSON.stringify(data.eval.false_positives)}` : '')
-    : when;
+    : '';
+}
+
+// Format an ISO/UTC timestamp as local-time "YYYY-MM-DD HH:mm".
+function fmtLocal(iso){
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 // --- history navigation ---
@@ -504,11 +492,10 @@ async function showDate(date){
     // fall back to today's data.json if a specific day file is missing
     try { render(await loadJSON('data.json')); } catch (e2) { showError(e2.message); }
   }
+  if (date) sel.value = date;
   const i = dates.indexOf(date);
   prevBtn.disabled = !(i >= 0 && i < dates.length - 1);   // older
   nextBtn.disabled = !(i > 0);                            // newer
-  document.getElementById('dayhint').textContent =
-    (date && date === dates[0]) ? '(latest)' : (date ? `(${dates.length}-day history)` : '');
 }
 
 async function main(){
@@ -518,9 +505,10 @@ async function main(){
 
   if (Array.isArray(dates) && dates.length){
     document.getElementById('controls').style.display = 'flex';
-    sel.innerHTML = dates.map(d=>`<option value="${d}">${d}</option>`).join('');
+    sel.max = dates[0];                       // newest selectable day
+    sel.min = dates[dates.length - 1];        // oldest selectable day
     sel.value = dates[0];
-    sel.onchange = () => showDate(sel.value);
+    sel.onchange = () => { if (sel.value) showDate(sel.value); };
     prevBtn.onclick = () => { const i = dates.indexOf(sel.value); if (i < dates.length-1){ sel.value = dates[i+1]; showDate(sel.value); } };
     nextBtn.onclick = () => { const i = dates.indexOf(sel.value); if (i > 0){ sel.value = dates[i-1]; showDate(sel.value); } };
     await showDate(dates[0]);
