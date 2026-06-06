@@ -679,6 +679,7 @@
     {
       "id": "me",
       "name": "Me",
+      "device": "Apple Watch",
       "real": true,
       "history": [
         {
