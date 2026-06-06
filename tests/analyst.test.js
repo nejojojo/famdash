@@ -1,7 +1,10 @@
 // tests/analyst.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { recentWindow, buildMemberContext, buildPrompt, runAnalyst, validateReport, ANALYST_SCHEMA } from '../src/analyst.js';
+import { recentWindow, buildMemberContext, buildPrompt, runAnalyst, validateReport, ANALYST_SCHEMA, ANALYST_SYSTEM, loadSystemPrompt } from '../src/analyst.js';
+import { writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { loadMemberData } from '../src/sources.js';
 import { applyPerturbations } from '../src/scenarios.js';
 import { computeBaseline } from '../src/baseline.js';
@@ -39,6 +42,29 @@ test('INFORMATION BARRIER: prompt never contains the scenario label', async () =
   const prompt = buildPrompt(members, baselines);
   assert.ok(!prompt.includes(label), 'prompt leaked the hidden scenario label');
   assert.ok(prompt.includes('baseline'), 'prompt should present baselines');
+});
+
+// --- The system prompt is sourced from docs/ANALYST.md (single source of truth) ---
+test('ANALYST_SYSTEM is loaded from the doc and carries the core instructions', () => {
+  assert.ok(ANALYST_SYSTEM.length > 0, 'prompt should be non-empty');
+  assert.ok(ANALYST_SYSTEM.startsWith('You are a careful family health analyst'), 'prompt should be the doc text, not a fence/marker');
+  assert.ok(!ANALYST_SYSTEM.includes('ANALYST_PROMPT_START'), 'sentinel markers must be stripped');
+  assert.ok(!ANALYST_SYSTEM.includes('```'), 'code fence must be stripped');
+  assert.ok(ANALYST_SYSTEM.includes('RELATIVE TO THAT PERSON'), 'core reasoning rule should survive extraction');
+});
+
+test('loadSystemPrompt extracts the fenced block between sentinels', () => {
+  const p = join(tmpdir(), `analyst-prompt-${process.pid}.md`);
+  writeFileSync(p, 'preamble\n<!-- ANALYST_PROMPT_START -->\n```text\nHELLO PROMPT\n```\n<!-- ANALYST_PROMPT_END -->\ntrailer\n');
+  try { assert.equal(loadSystemPrompt(p), 'HELLO PROMPT'); }
+  finally { rmSync(p, { force: true }); }
+});
+
+test('loadSystemPrompt throws loudly when the block is missing', () => {
+  const p = join(tmpdir(), `analyst-noprompt-${process.pid}.md`);
+  writeFileSync(p, '# doc with no prompt block\n');
+  try { assert.throws(() => loadSystemPrompt(p), /prompt block not found/); }
+  finally { rmSync(p, { force: true }); }
 });
 
 test('runAnalyst passes the schema and returns the model JSON', async () => {

@@ -1,4 +1,5 @@
 // src/analyst.js
+import { readFileSync } from 'node:fs';
 import { METRIC_META } from './metrics.js';
 
 // Recent window (default 7 days incl. today) shown to the analyst.
@@ -19,34 +20,23 @@ export function buildMemberContext(member, baselines) {
   };
 }
 
-export const ANALYST_SYSTEM = `You are a careful family health analyst reviewing wearable data.
-You receive, for each person: their personal BASELINE (mean and std per metric) computed from their own
-recent history, their last several days, and today's values. Metrics: rhr (resting HR, bpm — lower is
-usually better), sleep_eff (sleep efficiency %), steps, hrv (heart-rate variability ms — higher is
-usually better).
+// The analyst's system prompt is the SINGLE SOURCE OF TRUTH in docs/ANALYST.md, kept there so it
+// can be read and edited as prose. We extract the verbatim text between the sentinel comments
+// (around a fenced block) at load time. Editing the doc changes the analyst — no code change needed.
+// Resolve relative to THIS module so cwd doesn't matter (GitHub Actions runs from repo root, tests don't).
+const PROMPT_DOC = new URL('../docs/ANALYST.md', import.meta.url);
+const PROMPT_RE = /<!-- ANALYST_PROMPT_START -->\s*```[a-z]*\n([\s\S]*?)\n```\s*<!-- ANALYST_PROMPT_END -->/;
 
-How to reason:
-- Judge every value RELATIVE TO THAT PERSON'S OWN BASELINE, not generic norms. "Normal" differs per person.
-- SYNTHESIZE across signals. A single metric off by a little is usually noise. The interesting cases are
-  when several signals move together (e.g. resting HR up WHILE hrv and sleep efficiency are down — that
-  pattern reads as poor recovery / possible oncoming illness, something no single threshold would catch).
-- If a person did not sync today (synced_today=false), say so plainly and note how long data has been
-  missing; do not invent values.
-- It is not only acceptable but expected to say "all clear" / "nothing notable" for people who are within
-  their normal range. Do not manufacture concern. A quiet day should read as a quiet day.
+export function loadSystemPrompt(docPath = PROMPT_DOC) {
+  const md = readFileSync(docPath, 'utf8');
+  const m = md.match(PROMPT_RE);
+  if (!m || !m[1].trim()) {
+    throw new Error('docs/ANALYST.md: prompt block not found between <!-- ANALYST_PROMPT_START --> and <!-- ANALYST_PROMPT_END -->');
+  }
+  return m[1].trim();
+}
 
-Safety framing (always):
-- You DESCRIBE patterns and may suggest "worth a check-in" or "worth mentioning to a doctor."
-- You NEVER diagnose a condition and NEVER alarm. No "you have X". No emergencies.
-
-Output: for each person give status ('all_clear', 'worth_noting', or 'no_data'), a one-to-two sentence
-summary, and changed_signals. Each changed_signal is an OBJECT carrying BOTH the raw operator detail and a
-plain-language family phrase: { "metric": one of rhr|sleep_eff|steps|hrv, "z": signed number of sigmas
-(e.g. 2.4 or -1.9), "phrase": a short plain-English sentence a family member understands
-(e.g. "resting heart rate noticeably higher than usual", "HRV lower than usual") }. When all clear,
-changed_signals is an empty array. Always provide a gentle suggestion as a STRING; use an empty string ""
-to mean "no suggestion" (do NOT omit the field, do NOT use null). Also give a one-line headline
-summarizing the whole family and the date.`;
+export const ANALYST_SYSTEM = loadSystemPrompt();
 
 // Structured-output schema for Gemini (responseSchema).
 //
