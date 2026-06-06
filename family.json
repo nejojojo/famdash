@@ -4,6 +4,6 @@
     { "id": "m1", "name": "Mom",    "source": "synthetic", "means": { "rhr": 58, "sleep_eff": 90, "steps": 9000,  "hrv": 65 } },
     { "id": "m2", "name": "Dad",    "source": "synthetic", "means": { "rhr": 62, "sleep_eff": 86, "steps": 6500,  "hrv": 48 } },
     { "id": "m3", "name": "Sister", "source": "synthetic", "means": { "rhr": 66, "sleep_eff": 88, "steps": 11000, "hrv": 55 } },
-    { "id": "me", "name": "Me",     "source": "feed" }
+    { "id": "me", "name": "Me",     "source": "feed", "device": "Apple Watch" }
   ]
 }

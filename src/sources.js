@@ -88,21 +88,22 @@ export function mergeFeedRow(history, row, { today, keepDays = 35 }) {
     .slice(-keepDays);
 }
 
-// Build one member's data from its source. Returns { id, name, real, history, today, feed_state? }.
+// Build one member's data from its source. Returns { id, name, device?, real, history, today, feed_state? }.
 export async function loadMemberData(member, { today, days, seed, readFeed }) {
+  const device = member.device ? { device: member.device } : {};
   if (member.source === 'synthetic') {
     const series = generateMemberSeries({ means: member.means }, { today, days, seed });
-    return { id: member.id, name: member.name, real: false, history: series.slice(0, -1), today: series[series.length - 1] };
+    return { id: member.id, name: member.name, ...device, real: false, history: series.slice(0, -1), today: series[series.length - 1] };
   }
   // feed source
   const read = readFeed || readFeedFile;
   let rows;
   try { rows = await read(member); }
-  catch { return { id: member.id, name: member.name, real: true, history: emptyWindow(today, days), today: null, feed_state: 'error' }; }
+  catch { return { id: member.id, name: member.name, ...device, real: true, history: emptyWindow(today, days), today: null, feed_state: 'error' }; }
   const { history, today: todayEntry, presentDays } = normalizeFeed(rows, { today, days });
   let feed_state;
   if (presentDays < MIN_DAYS) feed_state = 'never_synced';
   else if (!todayEntry) feed_state = 'stale';
   else feed_state = 'ok';
-  return { id: member.id, name: member.name, real: true, history, today: feed_state === 'ok' ? todayEntry : null, feed_state };
+  return { id: member.id, name: member.name, ...device, real: true, history, today: feed_state === 'ok' ? todayEntry : null, feed_state };
 }
