@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:27:20.967Z",
+  "generated_at": "2026-06-05T16:29:09.541Z",
   "simulated": true,
   "scenario": "all_normal",
   "scenario_member": null,
@@ -978,46 +978,46 @@
   },
   "report": {
     "date": "2026-06-05",
-    "headline": "A mostly clear day for the family, with one member showing some notable changes in activity and recovery.",
+    "headline": "Mostly a quiet day with one member showing notable changes and missing data.",
     "members": [
       {
         "name": "Mom",
         "status": "all_clear",
-        "summary": "All her metrics are well within her typical ranges for today, indicating a normal day.",
+        "summary": "Mom's metrics for today are all within her usual ranges, indicating a generally consistent day for recovery and activity.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Dad",
         "status": "all_clear",
-        "summary": "All his metrics are well within his typical ranges for today, indicating a normal day.",
+        "summary": "Dad's activity and recovery metrics are aligned with his personal baseline today, showing no significant deviations.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Sister",
         "status": "all_clear",
-        "summary": "All her metrics are well within her typical ranges for today, indicating a normal day.",
+        "summary": "Sister's health metrics are consistent with her baseline today, showing typical activity and recovery patterns.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Me",
         "status": "worth_noting",
-        "summary": "Today's data shows significantly lower steps and heart rate variability (HRV) compared to usual, with resting heart rate and sleep efficiency data missing.",
+        "summary": "Your steps count and HRV were significantly lower than usual today. Additionally, data for resting heart rate and sleep efficiency were not recorded.",
         "changed_signals": [
           {
             "metric": "steps",
             "z": -3.55,
-            "phrase": "Steps were significantly lower than usual."
+            "phrase": "Your steps count was significantly lower than usual"
           },
           {
             "metric": "hrv",
             "z": -2.69,
-            "phrase": "Heart rate variability (HRV) was noticeably lower than usual."
+            "phrase": "Your HRV was significantly lower than usual"
           }
         ],
-        "suggestion": "It might be worth a brief check-in to see how you are feeling, especially with the missing data for RHR and sleep efficiency. Consider ensuring your device synced completely."
+        "suggestion": "It might be worth a quick check-in to ensure everything is okay, especially given the low activity and HRV readings, and missing sleep/rhr data."
       }
     ]
   },
@@ -1033,7 +1033,7 @@
     "gate_fired": false,
     "scenario_pool_size": 0,
     "scenario_pool_valid": 0,
-    "llm_ms": 13101,
+    "llm_ms": 23459,
     "model": "gemini-2.5-flash",
     "telegram_ok": true
   }
