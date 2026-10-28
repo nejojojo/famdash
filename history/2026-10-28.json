@@ -1,0 +1,1017 @@
+{
+  "generated_at": "2026-10-28T19:24:31.663Z",
+  "simulated": true,
+  "scenario": "all_normal",
+  "scenario_member": null,
+  "members": [
+    {
+      "id": "m1",
+      "name": "Mom",
+      "real": false,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "sleep_eff": 88.1,
+          "rhr": 57.5,
+          "hrv": 61.9,
+          "steps": 6146
+        },
+        {
+          "date": "2026-09-29",
+          "sleep_eff": 95,
+          "rhr": 57.2,
+          "hrv": 76.1,
+          "steps": 7172
+        },
+        {
+          "date": "2026-09-30",
+          "sleep_eff": 88.7,
+          "rhr": 57.6,
+          "hrv": 65,
+          "steps": 8925
+        },
+        {
+          "date": "2026-10-01",
+          "sleep_eff": 88.1,
+          "rhr": 56.8,
+          "hrv": 61.7,
+          "steps": 8519
+        },
+        {
+          "date": "2026-10-02",
+          "sleep_eff": 91.5,
+          "rhr": 57.7,
+          "hrv": 63.7,
+          "steps": 10555
+        },
+        {
+          "date": "2026-10-03",
+          "sleep_eff": 92.4,
+          "rhr": 53.6,
+          "hrv": 70.3,
+          "steps": 7816
+        },
+        {
+          "date": "2026-10-04",
+          "sleep_eff": 84.7,
+          "rhr": 56.6,
+          "hrv": 71.4,
+          "steps": 10294
+        },
+        {
+          "date": "2026-10-05",
+          "sleep_eff": 90.5,
+          "rhr": 55.8,
+          "hrv": 65.5,
+          "steps": 9011
+        },
+        {
+          "date": "2026-10-06",
+          "sleep_eff": 89,
+          "rhr": 56,
+          "hrv": 61.1,
+          "steps": 6828
+        },
+        {
+          "date": "2026-10-07",
+          "sleep_eff": 85.7,
+          "rhr": 60.2,
+          "hrv": 66.5,
+          "steps": 9374
+        },
+        {
+          "date": "2026-10-08",
+          "sleep_eff": 95.3,
+          "rhr": 57.7,
+          "hrv": 61.1,
+          "steps": 9844
+        },
+        {
+          "date": "2026-10-09",
+          "sleep_eff": 89.8,
+          "rhr": 56.6,
+          "hrv": 63.2,
+          "steps": 8064
+        },
+        {
+          "date": "2026-10-10",
+          "sleep_eff": 88.7,
+          "rhr": 58.4,
+          "hrv": 70.5,
+          "steps": 10143
+        },
+        {
+          "date": "2026-10-11",
+          "sleep_eff": 87.5,
+          "rhr": 57.5,
+          "hrv": 55.4,
+          "steps": 10643
+        },
+        {
+          "date": "2026-10-12",
+          "sleep_eff": 90.3,
+          "rhr": 61.4,
+          "hrv": 60.1,
+          "steps": 12304
+        },
+        {
+          "date": "2026-10-13",
+          "sleep_eff": 91.8,
+          "rhr": 59.9,
+          "hrv": 67.5,
+          "steps": 10292
+        },
+        {
+          "date": "2026-10-14",
+          "sleep_eff": 86.2,
+          "rhr": 58.3,
+          "hrv": 62.6,
+          "steps": 7052
+        },
+        {
+          "date": "2026-10-15",
+          "sleep_eff": 89.6,
+          "rhr": 60.5,
+          "hrv": 62.6,
+          "steps": 8569
+        },
+        {
+          "date": "2026-10-16",
+          "sleep_eff": 93.6,
+          "rhr": 55.3,
+          "hrv": 74,
+          "steps": 10124
+        },
+        {
+          "date": "2026-10-17",
+          "sleep_eff": 90.4,
+          "rhr": 56.9,
+          "hrv": 63.5,
+          "steps": 9275
+        },
+        {
+          "date": "2026-10-18",
+          "sleep_eff": 90.2,
+          "rhr": 58.6,
+          "hrv": 60.7,
+          "steps": 10810
+        },
+        {
+          "date": "2026-10-19",
+          "sleep_eff": 89.9,
+          "rhr": 55.7,
+          "hrv": 58.2,
+          "steps": 8130
+        },
+        {
+          "date": "2026-10-20",
+          "sleep_eff": 91.2,
+          "rhr": 59.2,
+          "hrv": 67.6,
+          "steps": 9084
+        },
+        {
+          "date": "2026-10-21",
+          "sleep_eff": 89,
+          "rhr": 56.2,
+          "hrv": 60.7,
+          "steps": 8278
+        },
+        {
+          "date": "2026-10-22",
+          "sleep_eff": 92.2,
+          "rhr": 57.5,
+          "hrv": 56.1,
+          "steps": 7830
+        },
+        {
+          "date": "2026-10-23",
+          "sleep_eff": 90.8,
+          "rhr": 56.3,
+          "hrv": 74.1,
+          "steps": 7138
+        },
+        {
+          "date": "2026-10-24",
+          "sleep_eff": 89.9,
+          "rhr": 56.9,
+          "hrv": 56.2,
+          "steps": 10913
+        },
+        {
+          "date": "2026-10-25",
+          "sleep_eff": 87.5,
+          "rhr": 58.2,
+          "hrv": 69.9,
+          "steps": 10287
+        },
+        {
+          "date": "2026-10-26",
+          "sleep_eff": 88.2,
+          "rhr": 59.9,
+          "hrv": 59,
+          "steps": 9697
+        },
+        {
+          "date": "2026-10-27",
+          "sleep_eff": 91.2,
+          "rhr": 59.1,
+          "hrv": 65.2,
+          "steps": 9943
+        }
+      ],
+      "today": {
+        "date": "2026-10-28",
+        "sleep_eff": 87.3,
+        "rhr": 58.8,
+        "hrv": 64.7,
+        "steps": 9808
+      }
+    },
+    {
+      "id": "m2",
+      "name": "Dad",
+      "real": false,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "sleep_eff": 90,
+          "rhr": 66.5,
+          "hrv": 49.5,
+          "steps": 5372
+        },
+        {
+          "date": "2026-09-29",
+          "sleep_eff": 87.8,
+          "rhr": 61.1,
+          "hrv": 52.2,
+          "steps": 6657
+        },
+        {
+          "date": "2026-09-30",
+          "sleep_eff": 84.5,
+          "rhr": 60.2,
+          "hrv": 51.5,
+          "steps": 6415
+        },
+        {
+          "date": "2026-10-01",
+          "sleep_eff": 87.5,
+          "rhr": 65.3,
+          "hrv": 50,
+          "steps": 10290
+        },
+        {
+          "date": "2026-10-02",
+          "sleep_eff": 85.7,
+          "rhr": 59.9,
+          "hrv": 40,
+          "steps": 7504
+        },
+        {
+          "date": "2026-10-03",
+          "sleep_eff": 86.4,
+          "rhr": 61.5,
+          "hrv": 46,
+          "steps": 7654
+        },
+        {
+          "date": "2026-10-04",
+          "sleep_eff": 88,
+          "rhr": 63.6,
+          "hrv": 46.4,
+          "steps": 5047
+        },
+        {
+          "date": "2026-10-05",
+          "sleep_eff": 92.3,
+          "rhr": 62.3,
+          "hrv": 54.1,
+          "steps": 5195
+        },
+        {
+          "date": "2026-10-06",
+          "sleep_eff": 90.8,
+          "rhr": 57.9,
+          "hrv": 48,
+          "steps": 6609
+        },
+        {
+          "date": "2026-10-07",
+          "sleep_eff": 91.9,
+          "rhr": 61.7,
+          "hrv": 48.8,
+          "steps": 7692
+        },
+        {
+          "date": "2026-10-08",
+          "sleep_eff": 88,
+          "rhr": 63.4,
+          "hrv": 56.8,
+          "steps": 6328
+        },
+        {
+          "date": "2026-10-09",
+          "sleep_eff": 87.7,
+          "rhr": 59.3,
+          "hrv": 44.8,
+          "steps": 5897
+        },
+        {
+          "date": "2026-10-10",
+          "sleep_eff": 86.4,
+          "rhr": 62.8,
+          "hrv": 47.2,
+          "steps": 6926
+        },
+        {
+          "date": "2026-10-11",
+          "sleep_eff": 83.9,
+          "rhr": 61.8,
+          "hrv": 44.8,
+          "steps": 6134
+        },
+        {
+          "date": "2026-10-12",
+          "sleep_eff": 82.6,
+          "rhr": 64,
+          "hrv": 54.4,
+          "steps": 7264
+        },
+        {
+          "date": "2026-10-13",
+          "sleep_eff": 84.2,
+          "rhr": 63.2,
+          "hrv": 52.5,
+          "steps": 6807
+        },
+        {
+          "date": "2026-10-14",
+          "sleep_eff": 86.7,
+          "rhr": 60.1,
+          "hrv": 56.1,
+          "steps": 7236
+        },
+        {
+          "date": "2026-10-15",
+          "sleep_eff": 85.8,
+          "rhr": 62.3,
+          "hrv": 52.4,
+          "steps": 5945
+        },
+        {
+          "date": "2026-10-16",
+          "sleep_eff": 90.6,
+          "rhr": 61.8,
+          "hrv": 40.3,
+          "steps": 7227
+        },
+        {
+          "date": "2026-10-17",
+          "sleep_eff": 86.8,
+          "rhr": 59.6,
+          "hrv": 50.3,
+          "steps": 5444
+        },
+        {
+          "date": "2026-10-18",
+          "sleep_eff": 80.1,
+          "rhr": 62.9,
+          "hrv": 39.2,
+          "steps": 5570
+        },
+        {
+          "date": "2026-10-19",
+          "sleep_eff": 88.4,
+          "rhr": 61.4,
+          "hrv": 40.1,
+          "steps": 5804
+        },
+        {
+          "date": "2026-10-20",
+          "sleep_eff": 86.9,
+          "rhr": 58.7,
+          "hrv": 42.9,
+          "steps": 5533
+        },
+        {
+          "date": "2026-10-21",
+          "sleep_eff": 89.8,
+          "rhr": 60.2,
+          "hrv": 44.7,
+          "steps": 4918
+        },
+        {
+          "date": "2026-10-22",
+          "sleep_eff": 88.2,
+          "rhr": 63.7,
+          "hrv": 47.4,
+          "steps": 7153
+        },
+        {
+          "date": "2026-10-23",
+          "sleep_eff": 80.6,
+          "rhr": 60.7,
+          "hrv": 53.8,
+          "steps": 8505
+        },
+        {
+          "date": "2026-10-24",
+          "sleep_eff": 87.1,
+          "rhr": 60.2,
+          "hrv": 46,
+          "steps": 7929
+        },
+        {
+          "date": "2026-10-25",
+          "sleep_eff": 83.5,
+          "rhr": 60,
+          "hrv": 52.8,
+          "steps": 7987
+        },
+        {
+          "date": "2026-10-26",
+          "sleep_eff": 85.4,
+          "rhr": 64.3,
+          "hrv": 34,
+          "steps": 6345
+        },
+        {
+          "date": "2026-10-27",
+          "sleep_eff": 88.1,
+          "rhr": 60.2,
+          "hrv": 47.2,
+          "steps": 3992
+        }
+      ],
+      "today": {
+        "date": "2026-10-28",
+        "sleep_eff": 87.2,
+        "rhr": 61.2,
+        "hrv": 52.7,
+        "steps": 6541
+      }
+    },
+    {
+      "id": "m3",
+      "name": "Sister",
+      "real": false,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "sleep_eff": 88,
+          "rhr": 65,
+          "hrv": 50.2,
+          "steps": 9442
+        },
+        {
+          "date": "2026-09-29",
+          "sleep_eff": 87.6,
+          "rhr": 65.3,
+          "hrv": 44.5,
+          "steps": 8924
+        },
+        {
+          "date": "2026-09-30",
+          "sleep_eff": 87.1,
+          "rhr": 68,
+          "hrv": 61.4,
+          "steps": 13093
+        },
+        {
+          "date": "2026-10-01",
+          "sleep_eff": 86.4,
+          "rhr": 64.5,
+          "hrv": 61.5,
+          "steps": 12071
+        },
+        {
+          "date": "2026-10-02",
+          "sleep_eff": 89.1,
+          "rhr": 66.9,
+          "hrv": 58.6,
+          "steps": 11032
+        },
+        {
+          "date": "2026-10-03",
+          "sleep_eff": 86.2,
+          "rhr": 64.7,
+          "hrv": 63.2,
+          "steps": 13537
+        },
+        {
+          "date": "2026-10-04",
+          "sleep_eff": 85.8,
+          "rhr": 70,
+          "hrv": 55.1,
+          "steps": 9524
+        },
+        {
+          "date": "2026-10-05",
+          "sleep_eff": 91.2,
+          "rhr": 64.2,
+          "hrv": 55.9,
+          "steps": 11275
+        },
+        {
+          "date": "2026-10-06",
+          "sleep_eff": 90,
+          "rhr": 61.8,
+          "hrv": 55.8,
+          "steps": 11494
+        },
+        {
+          "date": "2026-10-07",
+          "sleep_eff": 87.3,
+          "rhr": 66.5,
+          "hrv": 61,
+          "steps": 13294
+        },
+        {
+          "date": "2026-10-08",
+          "sleep_eff": 85.9,
+          "rhr": 64.2,
+          "hrv": 51.5,
+          "steps": 12113
+        },
+        {
+          "date": "2026-10-09",
+          "sleep_eff": 88.1,
+          "rhr": 66.5,
+          "hrv": 56.7,
+          "steps": 10002
+        },
+        {
+          "date": "2026-10-10",
+          "sleep_eff": 86.6,
+          "rhr": 64.4,
+          "hrv": 52.9,
+          "steps": 12606
+        },
+        {
+          "date": "2026-10-11",
+          "sleep_eff": 92.6,
+          "rhr": 63.8,
+          "hrv": 53.2,
+          "steps": 11832
+        },
+        {
+          "date": "2026-10-12",
+          "sleep_eff": 88.9,
+          "rhr": 64.3,
+          "hrv": 60.4,
+          "steps": 10300
+        },
+        {
+          "date": "2026-10-13",
+          "sleep_eff": 90.2,
+          "rhr": 65.5,
+          "hrv": 48.6,
+          "steps": 12964
+        },
+        {
+          "date": "2026-10-14",
+          "sleep_eff": 86.6,
+          "rhr": 64.4,
+          "hrv": 62.6,
+          "steps": 11276
+        },
+        {
+          "date": "2026-10-15",
+          "sleep_eff": 88.4,
+          "rhr": 64.3,
+          "hrv": 52.1,
+          "steps": 10219
+        },
+        {
+          "date": "2026-10-16",
+          "sleep_eff": 92.8,
+          "rhr": 68.4,
+          "hrv": 59.8,
+          "steps": 14393
+        },
+        {
+          "date": "2026-10-17",
+          "sleep_eff": 85.6,
+          "rhr": 65.6,
+          "hrv": 54.7,
+          "steps": 10477
+        },
+        {
+          "date": "2026-10-18",
+          "sleep_eff": 86.8,
+          "rhr": 66.3,
+          "hrv": 53.2,
+          "steps": 12300
+        },
+        {
+          "date": "2026-10-19",
+          "sleep_eff": 90.7,
+          "rhr": 67.6,
+          "hrv": 58.8,
+          "steps": 12740
+        },
+        {
+          "date": "2026-10-20",
+          "sleep_eff": 90.7,
+          "rhr": 63.3,
+          "hrv": 57.1,
+          "steps": 9350
+        },
+        {
+          "date": "2026-10-21",
+          "sleep_eff": 83.8,
+          "rhr": 68.6,
+          "hrv": 62.1,
+          "steps": 9384
+        },
+        {
+          "date": "2026-10-22",
+          "sleep_eff": 90.5,
+          "rhr": 64.3,
+          "hrv": 49.5,
+          "steps": 11801
+        },
+        {
+          "date": "2026-10-23",
+          "sleep_eff": 85.5,
+          "rhr": 67.1,
+          "hrv": 57,
+          "steps": 9674
+        },
+        {
+          "date": "2026-10-24",
+          "sleep_eff": 91.1,
+          "rhr": 69.7,
+          "hrv": 55.4,
+          "steps": 7278
+        },
+        {
+          "date": "2026-10-25",
+          "sleep_eff": 89.3,
+          "rhr": 63,
+          "hrv": 54.2,
+          "steps": 13965
+        },
+        {
+          "date": "2026-10-26",
+          "sleep_eff": 87.9,
+          "rhr": 62.5,
+          "hrv": 53.2,
+          "steps": 11154
+        },
+        {
+          "date": "2026-10-27",
+          "sleep_eff": 82.9,
+          "rhr": 67.1,
+          "hrv": 48,
+          "steps": 10053
+        }
+      ],
+      "today": {
+        "date": "2026-10-28",
+        "sleep_eff": 86.8,
+        "rhr": 65.2,
+        "hrv": 56.6,
+        "steps": 9404
+      }
+    },
+    {
+      "id": "me",
+      "name": "Me",
+      "device": "Apple Watch",
+      "real": true,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-09-29",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-09-30",
+          "rhr": null,
+          "hrv": null,
+          "sleep_eff": null,
+          "steps": 2130
+        },
+        {
+          "date": "2026-10-01",
+          "rhr": null,
+          "hrv": null,
+          "sleep_eff": null,
+          "steps": 415
+        },
+        {
+          "date": "2026-10-02",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-03",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-04",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-05",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-06",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-07",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-08",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-09",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-10",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-11",
+          "rhr": null,
+          "hrv": null,
+          "sleep_eff": null,
+          "steps": 5203
+        },
+        {
+          "date": "2026-10-12",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-13",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-14",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-15",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-16",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-17",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-18",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-19",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-20",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-21",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-22",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-23",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-24",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-25",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-26",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        },
+        {
+          "date": "2026-10-27",
+          "rhr": null,
+          "sleep_eff": null,
+          "steps": null,
+          "hrv": null
+        }
+      ],
+      "today": null,
+      "feed_state": "stale"
+    }
+  ],
+  "baselines": {
+    "m1": {
+      "rhr": {
+        "mean": 57.63666666666668,
+        "std": 1.7183559370621622
+      },
+      "sleep_eff": {
+        "mean": 89.89999999999999,
+        "std": 2.4598850547858158
+      },
+      "steps": {
+        "mean": 9102,
+        "std": 1454.4986101390925
+      },
+      "hrv": {
+        "mean": 64.38,
+        "std": 5.496105204032497
+      }
+    },
+    "m2": {
+      "rhr": {
+        "mean": 61.686666666666675,
+        "std": 2.008384722955813
+      },
+      "sleep_eff": {
+        "mean": 86.85666666666665,
+        "std": 2.9603917882992934
+      },
+      "steps": {
+        "mean": 6579.3,
+        "std": 1269.6351946863347
+      },
+      "hrv": {
+        "mean": 47.80666666666666,
+        "std": 5.531036775875926
+      }
+    },
+    "m3": {
+      "rhr": {
+        "mean": 65.59333333333332,
+        "std": 2.074131863818149
+      },
+      "sleep_eff": {
+        "mean": 88.12000000000002,
+        "std": 2.454468128353564
+      },
+      "steps": {
+        "mean": 11252.233333333334,
+        "std": 1690.7084555325307
+      },
+      "hrv": {
+        "mean": 55.606666666666676,
+        "std": 4.7890632107732305
+      }
+    },
+    "me": {
+      "rhr": {
+        "mean": null,
+        "std": 0
+      },
+      "sleep_eff": {
+        "mean": null,
+        "std": 0
+      },
+      "steps": {
+        "mean": 2582.6666666666665,
+        "std": 2425.884649634713
+      },
+      "hrv": {
+        "mean": null,
+        "std": 0
+      }
+    }
+  },
+  "report": {
+    "date": "2026-10-28",
+    "headline": "All family members appear to be within their typical health ranges today.",
+    "members": [
+      {
+        "name": "Mom",
+        "status": "all_clear",
+        "summary": "Mom's metrics are within her usual ranges today, indicating a quiet and stable day.",
+        "changed_signals": [],
+        "suggestion": ""
+      },
+      {
+        "name": "Dad",
+        "status": "all_clear",
+        "summary": "Dad's health signals are looking good and are within his normal baseline today.",
+        "changed_signals": [],
+        "suggestion": ""
+      },
+      {
+        "name": "Sister",
+        "status": "all_clear",
+        "summary": "Sister's wellness indicators are currently within her expected personal ranges.",
+        "changed_signals": [],
+        "suggestion": ""
+      }
+    ]
+  },
+  "report_valid": true,
+  "eval": {
+    "scenario_applied": false,
+    "scenario_family": "all_normal",
+    "target_member": null,
+    "detected": null,
+    "false_positives": []
+  },
+  "telemetry": {
+    "gate_fired": false,
+    "scenario_pool_size": 0,
+    "scenario_pool_valid": 0,
+    "llm_ms": 11051,
+    "model": "gemini-2.5-flash",
+    "telegram_ok": false
+  }
+}
