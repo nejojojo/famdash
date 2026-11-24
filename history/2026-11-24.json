@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-24T01:33:19.515Z",
+  "generated_at": "2026-11-24T23:25:34.012Z",
   "simulated": true,
   "scenario": "all_normal",
   "scenario_member": null,
@@ -893,8 +893,14 @@
           "steps": 2407
         }
       ],
-      "today": null,
-      "feed_state": "stale"
+      "today": {
+        "date": "2026-11-24",
+        "rhr": 66,
+        "hrv": 60.5780152157261,
+        "sleep_eff": null,
+        "steps": 1012
+      },
+      "feed_state": "ok"
     }
   ],
   "baselines": {
@@ -973,28 +979,41 @@
   },
   "report": {
     "date": "2026-11-24",
-    "headline": "Family Health Report: All members within typical ranges.",
+    "headline": "Mostly stable day for the family, with one member showing a notable change in resting heart rate.",
     "members": [
       {
         "name": "Mom",
         "status": "all_clear",
-        "summary": "All health metrics are within typical ranges today, indicating a steady state of well-being.",
+        "summary": "All of Mom's health metrics are within her typical range today.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Dad",
         "status": "all_clear",
-        "summary": "Dad's metrics are consistently within his usual baseline today.",
+        "summary": "Dad's health metrics are all looking consistent with his recent baseline today.",
         "changed_signals": [],
         "suggestion": ""
       },
       {
         "name": "Sister",
         "status": "all_clear",
-        "summary": "All of Sister's tracked health metrics are within her expected personal ranges today.",
+        "summary": "Sister's data today shows all metrics within her typical range, indicating a stable day.",
         "changed_signals": [],
         "suggestion": ""
+      },
+      {
+        "name": "Me",
+        "status": "worth_noting",
+        "summary": "Your resting heart rate is noticeably higher than your typical range today. Sleep efficiency data continues to be unavailable, which limits insights into your recovery.",
+        "changed_signals": [
+          {
+            "metric": "rhr",
+            "z": 2.859,
+            "phrase": "resting heart rate noticeably higher than usual"
+          }
+        ],
+        "suggestion": "Consider checking in on your stress levels or recent activity, and ensure your device is tracking sleep efficiency if possible."
       }
     ]
   },
@@ -1010,7 +1029,7 @@
     "gate_fired": false,
     "scenario_pool_size": 0,
     "scenario_pool_valid": 0,
-    "llm_ms": 10387,
+    "llm_ms": 11021,
     "model": "gemini-2.5-flash",
     "telegram_ok": false
   }
